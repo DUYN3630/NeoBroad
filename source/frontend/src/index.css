@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-page: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-default: #f3f4f6;
+  --kendo-blue: #0072C6;
+  --kendo-blue-hover: #005a9e;
+}
+
+body {
+  background-color: #ffffff;
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* PHONG CÁCH TRẮNG TINH KHIẾT (CLEAN WHITE) */
+.k-bg-gradient {
+  background-color: #ffffff !important;
+  background-image: 
+    radial-gradient(circle at 2px 2px, #f3f4f6 1px, transparent 0) !important;
+  background-size: 24px 24px !important;
+  position: relative !important;
+}
+
+.k-card-premium {
+  @apply bg-white border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] relative z-10;
+}
+
+/* KENDO UI STYLE EMULATION */
+@layer components {
+  .k-button-primary {
+    @apply bg-[var(--kendo-blue)] hover:bg-[var(--kendo-blue-hover)] text-white font-bold py-2 px-4 rounded shadow-sm transition-all;
+  }
+  
+  .k-input {
+    @apply w-full px-3 py-2 bg-white border border-gray-200 rounded text-sm focus:border-[var(--kendo-blue)] focus:ring-4 focus:ring-blue-500/10 outline-none transition-all;
+  }
+
+  .k-label {
+    @apply block text-[11px] font-black text-gray-400 mb-1.5 uppercase tracking-wider;
+  }
+
+  .k-card {
+    @apply bg-white border border-gray-100 rounded shadow-sm;
+  }
+
+  .k-grid-header {
+    @apply bg-[#fafafa] border-b border-gray-100 text-[#374151] font-bold text-xs uppercase;
+  }
+}

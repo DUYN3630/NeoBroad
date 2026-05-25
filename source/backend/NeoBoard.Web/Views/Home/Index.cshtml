@@ -1,0 +1,72 @@
+﻿@addTagHelper *, Kendo.Mvc
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var username = !string.IsNullOrEmpty(ViewBag.User as string) ? ViewBag.User as string : "Guest";
+}
+
+<div id="dashboard-layout" style="display: flex; height: 100vh;">
+    <!-- Sidebar Menu -->
+    <div id="sidebar" style="width: 260px; background: white; box-shadow: 2px 0px 5px rgba(0,0,0,0.1); padding: 15px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px;">
+            <div style="display: flex; align-items: center;">
+                <img src="https://via.placeholder.com/50" style="border-radius: 50%; margin-right: 10px;" />
+                <div>
+                    <h3 style="margin-bottom: 5px;">@username</h3>
+                    <a href="mailto:@(username)@@example.com" style="color: gray; text-decoration: none;">@(username)@@example.com</a>
+                </div>
+            </div>
+            <kendo-button name="btnLogout" themeColor="primary" style="margin-top: 5px;" onclick="window.location.href='@Url.Action("Logout", "Home")'">
+                Logout
+            </kendo-button>
+        </div>
+
+        <kendo-panelbar name="SidebarMenu" expand-mode="single">
+            <items>
+                <panelbar-item text="Dashboard" icon="home" url="@Url.Action("Index", "Home")"></panelbar-item>
+                <panelbar-item text="AMS - Asset" icon="database">
+                    <items>
+                        <panelbar-item text="Quản lý thiết bị" url="@Url.Action("QuanLyThietBi", "Home")" />
+                        <panelbar-item text="Quản lý Toolset" url="@Url.Action("QuanLyToolset", "Home")" />
+                        <panelbar-item text="Quản lý lịch bảo trì" url="@Url.Action("QuanLyLichBaoTri", "Home")" />
+                    </items>
+                </panelbar-item>
+                <panelbar-item text="AMS - Ticket Management" icon="clipboard-text">
+                    <items>
+                        <panelbar-item text="Quản lý Maintenance Ticket" url="@Url.Action("QuanLyMaintenanceTicket", "Home")" />
+                        <panelbar-item text="Quản lý Failure Ticket" url="@Url.Action("QuanLyFailureTicket", "Home")" />
+                        <panelbar-item text="Quản lý Repair Ticket" url="@Url.Action("QuanLyRepairTicket", "Home")" />
+                    </items>
+                </panelbar-item>
+                <panelbar-item text="AMS - Task Assignment" icon="clipboard-check">
+                    <items>
+                        <panelbar-item text="Tạo công việc bảo trì" url="@Url.Action("TaoCongViecBaoTri", "Home")" />
+                        <panelbar-item text="Theo dõi tiến độ công việc" url="@Url.Action("TheoDoiTienDoCongViec", "Home")" />
+                    </items>
+                </panelbar-item>
+                <panelbar-item text="AMS - Role Assignment" icon="shield-user">
+                    <items>
+                        <panelbar-item text="Tạo người dùng mới" url="@Url.Action("TaoNguoiDungMoi", "Home")" />
+                        <panelbar-item text="Phân quyền người dùng" url="@Url.Action("PhanQuyenNguoiDung", "Home")" />
+                        <panelbar-item text="Quản lý quyền truy cập" url="@Url.Action("QuanLyQuyenTruyCap", "Home")" />
+                    </items>
+                </panelbar-item>
+                <panelbar-item text="Reports (Báo cáo)" icon="chart-line">
+                    <items>
+                        <panelbar-item text="Báo cáo trạng thái thiết bị" url="@Url.Action("BaoCaoTrangThaiThietBi", "Home")" />
+                        <panelbar-item text="Báo cáo lịch sử bảo trì" url="@Url.Action("BaoCaoLichSuBaoTri", "Home")" />
+                        <panelbar-item text="Báo cáo công việc hoàn thành" url="@Url.Action("BaoCaoCongViecHoanThanh", "Home")" />
+                    </items>
+                </panelbar-item>
+            </items>
+        </kendo-panelbar>
+    </div>
+
+    <!-- Content Area -->
+    <div id="content" style="flex-grow: 1; padding: 20px; background: #f9f9f9;">
+        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);">
+            <h1 style="margin-bottom: 10px;">Hello Again, @username!</h1>
+            <p>Chào mừng bạn đến với hệ thống quản lý AMS.</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+﻿@using NeoBoard.Application.DTOs
+@model LoginRequest
+@addTagHelper *, Kendo.Mvc
+
+<div id="login-container" class="k-d-flex k-justify-content-center k-align-items-center k-height-viewport k-bg-gradient">
+    <div class="k-card k-card-flat k-card-shadow" style="width: 400px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);">
+        <div class="k-card-header">
+            <h2 class="k-card-title k-text-center" style="font-size: 24px; font-weight: bold;">Đăng nhập</h2>
+        </div>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="k-messagebox k-messagebox-error k-text-center" style="padding: 10px; border-radius: 5px; margin-bottom: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
+                @ViewBag.Message
+            </div>
+        }
+
+        <kendo-form name="LoginForm" method="post">
+            <form-items>
+                <form-item field="EmailOrPhone">
+                    <item-label text="Email hoặc Số điện thoại" />
+                </form-item>
+                <form-item field="Password">
+                    <item-label text="Mật khẩu" />
+                </form-item>
+                <form-item field="Captcha">
+                    <item-label text="Xác minh Captcha" />
+                    <captcha-editor captcha-image="@ViewData["Captcha"]"
+                                    captcha-id="@ViewData["CaptchaID"]"
+                                    datacaptchafield="Captcha"
+                                    datacaptchaidfield="CaptchaID">
+                        <handler url="@Url.Action("ResetCaptcha", "Account")" />
+                        <validation-handler url="@Url.Action("ValidateCaptcha", "Account")" />
+                    </captcha-editor>
+                </form-item>
+            </form-items>
+
+            <buttons-template>
+                <kendo-button name="btnLogin" themeColor="primary" type="submit" class="k-width-full">Đăng nhập</kendo-button>
+            </buttons-template>
+        </kendo-form>
+    </div>
+</div>
