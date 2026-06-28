@@ -1,6 +1,7 @@
 import * as signalR from '@microsoft/signalr';
 
 export interface NotificationPayload {
+  id?: string;
   requestId?: string;
   studentName?: string;
   studentCode?: string;
@@ -10,6 +11,7 @@ export interface NotificationPayload {
   ticketId?: string;
   assetId?: string;
   assetName?: string;
+  itemName?: string;
   reportedBy?: string;
   urgency?: string;
   description?: string;
@@ -18,6 +20,11 @@ export interface NotificationPayload {
   email?: string;
   ipAddress?: string;
   attempts?: number;
+  priority?: number;
+  authorName?: string;
+  title?: string;
+  content?: string;
+  comments?: any[];
 }
 
 type NotificationCallback = (data: NotificationPayload) => void;
@@ -93,6 +100,8 @@ class SignalRService {
       'ReceiveFailureReport',
       'ReceiveMaintenanceAssignment',
       'ReceiveAnnouncement',
+      'ReceiveTimelinePost',
+      'ReceiveNewSurvey',
       'ReceiveBruteForceAlert'
     ];
 
