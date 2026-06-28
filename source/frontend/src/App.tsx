@@ -4,7 +4,10 @@ import { router } from './app/Router';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import './index.css';
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const rawClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = (rawClientId && rawClientId.trim() !== '' && rawClientId !== 'your-google-client-id-here.apps.googleusercontent.com')
+  ? rawClientId
+  : '123456789-placeholder.apps.googleusercontent.com';
 
 function App() {
   return (
