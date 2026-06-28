@@ -114,7 +114,27 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        var allowedOrigins = new List<string> 
+        { 
+            "http://localhost:5173", 
+            "https://neo-broad.vercel.app" 
+        };
+
+        var envOrigins = builder.Configuration["Cors:AllowedOrigins"] ?? Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+        if (!string.IsNullOrEmpty(envOrigins))
+        {
+            var origins = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var origin in origins)
+            {
+                var trimmed = origin.Trim();
+                if (!allowedOrigins.Contains(trimmed))
+                {
+                    allowedOrigins.Add(trimmed);
+                }
+            }
+        }
+
+        policy.WithOrigins(allowedOrigins.ToArray())
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
