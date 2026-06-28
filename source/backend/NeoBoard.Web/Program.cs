@@ -163,6 +163,26 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
+// Log connection string (with masked password) for debugging
+var connectionString = app.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrEmpty(connectionString))
+{
+    var parts = connectionString.Split(';');
+    for (int i = 0; i < parts.Length; i++)
+    {
+        var trimmedPart = parts[i].Trim();
+        if (trimmedPart.StartsWith("Password=", StringComparison.OrdinalIgnoreCase))
+        {
+            parts[i] = "Password=********";
+        }
+    }
+    Console.WriteLine($"[Database Config] Active Connection String: {string.Join(";", parts)}");
+}
+else
+{
+    Console.WriteLine("[Database Config] Connection string 'DefaultConnection' is null or empty!");
+}
+
 // Seed data
 using (var scope = app.Services.CreateScope())
 {
