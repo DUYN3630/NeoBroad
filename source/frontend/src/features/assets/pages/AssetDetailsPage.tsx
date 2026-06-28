@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import MainLayout from '@/components/layout/MainLayout';
 import apiClient from '@/lib/axios';
 import { 
   ArrowLeft, 
@@ -12,16 +11,20 @@ import {
   Cpu,
   Monitor,
   HardDrive,
-  Hash
+  Hash,
+  AlertTriangle
 } from 'lucide-react';
 
 interface Asset {
-  id: number;
+  id: string;
   name: string;
   serialNumber: string;
   type: string;
   status: string;
   createdAt: string;
+  lastMaintenance?: string;
+  purchaseDate?: string;
+  maintenanceIntervalMonths?: number;
 }
 
 const AssetDetailsPage = () => {
@@ -37,11 +40,20 @@ const AssetDetailsPage = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <MainLayout><div className="p-8 text-center">Đang tải...</div></MainLayout>;
-  if (!asset) return <MainLayout><div className="p-8 text-center text-red-500">Không tìm thấy thiết bị!</div></MainLayout>;
+  const getNextMaintenanceDate = () => {
+    if (!asset || !asset.maintenanceIntervalMonths) return null;
+    const refDateStr = asset.lastMaintenance || asset.purchaseDate || asset.createdAt;
+    if (!refDateStr) return null;
+    const refDate = new Date(refDateStr);
+    refDate.setMonth(refDate.getMonth() + asset.maintenanceIntervalMonths);
+    return refDate;
+  };
+
+  if (loading) return <div className="p-8 text-center">Đang tải...</div>;
+  if (!asset) return <div className="p-8 text-center text-red-500">Không tìm thấy thiết bị!</div>;
 
   return (
-    <MainLayout>
+    <>
       <button 
         onClick={() => navigate('/assets')}
         className="flex items-center text-gray-500 hover:text-[#0066cc] mb-6 transition-colors font-bold text-sm"
@@ -137,19 +149,39 @@ const AssetDetailsPage = () => {
                 </button>
             </div>
 
-            <div className="bg-gray-900 rounded-2xl p-6 text-white shadow-xl shadow-gray-200">
-                <h4 className="font-bold flex items-center mb-4">
-                    <ShieldCheck size={18} className="mr-2 text-green-400" /> Trạng thái kiểm định
-                </h4>
-                <p className="text-xs text-gray-400 mb-6 leading-relaxed">Thiết bị này đã vượt qua tất cả các bài kiểm tra an toàn điện vào tháng 3/2026.</p>
-                <div className="flex justify-between text-xs font-bold">
-                    <span>Lần tới:</span>
-                    <span className="text-green-400">15/09/2026</span>
+            {(() => {
+              const nextDate = getNextMaintenanceDate();
+              if (!nextDate) return null;
+              const isOverdue = nextDate < new Date();
+              return (
+                <div className={`rounded-2xl p-6 text-white shadow-xl ${
+                  isOverdue ? 'bg-amber-950/90 border border-amber-800' : 'bg-gray-900 shadow-gray-200'
+                }`}>
+                  <h4 className="font-bold flex items-center mb-4">
+                    {isOverdue ? (
+                      <AlertTriangle size={18} className="mr-2 text-amber-400 animate-pulse" />
+                    ) : (
+                      <ShieldCheck size={18} className="mr-2 text-green-400" />
+                    )}
+                    Trạng thái bảo trì
+                  </h4>
+                  <p className="text-xs text-gray-300 mb-6 leading-relaxed">
+                    {isOverdue 
+                      ? 'Thiết bị này đã trễ hạn bảo trì định kỳ! Vui lòng lên kế hoạch bàn giao và bảo dưỡng kỹ thuật sớm nhất có thể.' 
+                      : 'Thiết bị đang hoạt động bình thường, tình trạng bảo dưỡng định kỳ đúng hạn.'}
+                  </p>
+                  <div className="flex justify-between text-xs font-bold">
+                    <span>Hạn bảo trì tiếp theo:</span>
+                    <span className={isOverdue ? 'text-amber-400 font-extrabold' : 'text-green-400'}>
+                      {nextDate.toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
                 </div>
-            </div>
+              );
+            })()}
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

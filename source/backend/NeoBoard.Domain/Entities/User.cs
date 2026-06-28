@@ -10,9 +10,11 @@ namespace NeoBoard.Domain.Entities
         public string PasswordHash { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         public string? AvatarUrl { get; set; }
-        public int Role { get; set; } = 3; // 0:SuperAdmin, 1:Admin, 2:Manager, 3:Employee
+        public int Role { get; set; } = 3; // 0:SuperAdmin, 1:Staff (IT), 2:Teacher, 3:Student
         public string? Department { get; set; }
         public bool IsActive { get; set; } = true;
+        public string? PhoneNumber { get; set; }
+        public bool IsPhoneVerified { get; set; } = false;
         public DateTime? LastLoginAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

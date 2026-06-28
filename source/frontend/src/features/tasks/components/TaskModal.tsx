@@ -48,6 +48,11 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialD
 
   if (!isOpen) return null;
 
+  const formatDateForInput = (dateStr?: string) => {
+    if (!dateStr) return '';
+    return dateStr.split('T')[0];
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -78,15 +83,15 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialD
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 animate-in fade-in duration-200">
                     <div>
                         <label className="k-label">Mã công việc <span className="text-red-500">*</span></label>
-                        <input type="text" name="taskCode" required value={formData.taskCode} onChange={handleChange} className="k-input" placeholder="VD: TASK-2024-001" />
+                        <input type="text" name="taskCode" required value={formData.taskCode || ''} onChange={handleChange} className="k-input" placeholder="VD: TASK-2024-001" />
                     </div>
                     <div>
                         <label className="k-label">Tiêu đề công việc <span className="text-red-500">*</span></label>
-                        <input type="text" name="title" required value={formData.title} onChange={handleChange} className="k-input" />
+                        <input type="text" name="title" required value={formData.title || ''} onChange={handleChange} className="k-input" />
                     </div>
                     <div>
                         <label className="k-label">Loại công việc</label>
-                        <select name="taskType" value={formData.taskType} onChange={handleChange} className="k-input font-bold">
+                        <select name="taskType" value={formData.taskType || 'Maintenance'} onChange={handleChange} className="k-input font-bold">
                             <option value="Maintenance">Bảo trì định kỳ</option>
                             <option value="Repair">Sửa chữa sự cố</option>
                             <option value="Inspection">Kiểm định thiết bị</option>
@@ -95,18 +100,18 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialD
                     </div>
                     <div>
                         <label className="k-label">Thiết bị liên quan</label>
-                        <select name="relatedAssetId" value={formData.relatedAssetId} onChange={handleChange} className="k-input">
+                        <select name="relatedAssetId" value={formData.relatedAssetId || ''} onChange={handleChange} className="k-input">
                             <option value="">-- Không liên quan thiết bị cụ thể --</option>
                             {assets.map(a => <option key={a.id} value={a.id}>{a.name} ({a.serialNumber})</option>)}
                         </select>
                     </div>
                     <div className="col-span-2">
                         <label className="k-label">Mô tả nội dung công việc</label>
-                        <textarea name="description" rows={3} value={formData.description} onChange={handleChange} className="k-input resize-none" placeholder="Chi tiết các bước thực hiện..." />
+                        <textarea name="description" rows={3} value={formData.description || ''} onChange={handleChange} className="k-input resize-none" placeholder="Chi tiết các bước thực hiện..." />
                     </div>
                     <div className="col-span-2">
                         <label className="k-label flex items-center"><Settings size={12} className="mr-1" /> Yêu cầu vật tư / công cụ đi kèm</label>
-                        <textarea name="requirements" rows={2} value={formData.requirements} onChange={handleChange} className="k-input resize-none bg-gray-50 border-dashed" placeholder="VD: Bộ đồ nghề mạng, Keo tản nhiệt, Ổ cứng thay thế..." />
+                        <textarea name="requirements" rows={2} value={formData.requirements || ''} onChange={handleChange} className="k-input resize-none bg-gray-50 border-dashed" placeholder="VD: Bộ đồ nghề mạng, Keo tản nhiệt, Ổ cứng thay thế..." />
                     </div>
                 </div>
             )}
@@ -115,23 +120,23 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialD
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 animate-in fade-in duration-200">
                     <div>
                         <label className="k-label flex items-center"><User size={12} className="mr-1" /> Người thực hiện chính <span className="text-red-500">*</span></label>
-                        <input type="text" name="assignedTo" required value={formData.assignedTo} onChange={handleChange} className="k-input" placeholder="Tên kỹ thuật viên..." />
+                        <input type="text" name="assignedTo" required value={formData.assignedTo || ''} onChange={handleChange} className="k-input" placeholder="Tên kỹ thuật viên..." />
                     </div>
                     <div>
                         <label className="k-label flex items-center"><User size={12} className="mr-1" /> Người giám sát / Phê duyệt</label>
-                        <input type="text" name="supervisor" value={formData.supervisor} onChange={handleChange} className="k-input" />
+                        <input type="text" name="supervisor" value={formData.supervisor || ''} onChange={handleChange} className="k-input" />
                     </div>
                     <div>
                         <label className="k-label flex items-center"><Calendar size={12} className="mr-1" /> Ngày bắt đầu</label>
-                        <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} className="k-input" />
+                        <input type="date" name="startDate" value={formatDateForInput(formData.startDate)} onChange={handleChange} className="k-input" />
                     </div>
                     <div>
                         <label className="k-label flex items-center"><Calendar size={12} className="mr-1" /> Hạn chót hoàn thành (Due Date)</label>
-                        <input type="date" name="dueDate" value={formData.dueDate} onChange={handleChange} className="k-input font-bold text-red-600" />
+                        <input type="date" name="dueDate" value={formatDateForInput(formData.dueDate)} onChange={handleChange} className="k-input font-bold text-red-600" />
                     </div>
                     <div>
                         <label className="k-label">Độ ưu tiên</label>
-                        <select name="priority" value={formData.priority} onChange={handleChange} className="k-input">
+                        <select name="priority" value={formData.priority || 'Normal'} onChange={handleChange} className="k-input">
                             <option value="Low">Thấp (Tùy nghi)</option>
                             <option value="Normal">Trung bình (Bình thường)</option>
                             <option value="High">Cao (Cần thực hiện ngay)</option>
@@ -140,7 +145,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialD
                     </div>
                     <div>
                         <label className="k-label">Trạng thái ban đầu</label>
-                        <select name="status" value={formData.status} onChange={handleChange} className="k-input">
+                        <select name="status" value={formData.status || 'To Do'} onChange={handleChange} className="k-input">
                             <option value="To Do">Chờ thực hiện (To Do)</option>
                             <option value="In Progress">Đang triển khai</option>
                         </select>

@@ -12,7 +12,9 @@ namespace NeoBoard.Infrastructure.Data
         }
 
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Asset> Assets { get; set; }
+        public virtual DbSet<AssetHealth> AssetHealths { get; set; }
         public virtual DbSet<Toolset> Toolsets { get; set; }
         public virtual DbSet<BorrowRequest> BorrowRequests { get; set; }
         public virtual DbSet<BorrowItem> BorrowItems { get; set; }
@@ -27,12 +29,13 @@ namespace NeoBoard.Infrastructure.Data
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<FileAttachment> FileAttachments { get; set; }
         public virtual DbSet<UserActivity> UserActivities { get; set; }
+        public virtual DbSet<MaintenanceTicket> MaintenanceTickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Tự động chuyển tất cả tên bảng và tên cột sang lowercase cho PostgreSQL
+            // Tự động chuyển tất cả tên bảng và tên cột sang lowercase cho PostgreSQL/MySQL
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
                 // Đổi tên bảng
@@ -59,9 +62,18 @@ namespace NeoBoard.Infrastructure.Data
                 }
             }
 
-            // Cấu hình Quan hệ đặc thù nếu cần
+            // Cấu hình Quan hệ đặc thù
+            modelBuilder.Entity<Asset>(e => {
+                e.HasOne(d => d.AssignedTechnician).WithMany().HasForeignKey(d => d.AssignedTechnicianId).OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<AssetHealth>(e => {
+                e.HasOne(d => d.Asset).WithOne(p => p.Health).HasForeignKey<AssetHealth>(d => d.AssetId);
+            });
+
             modelBuilder.Entity<BorrowRequest>(e => {
                 e.HasOne(d => d.User).WithMany().HasForeignKey(d => d.UserId);
+                e.HasOne(d => d.Student).WithMany(p => p.BorrowRequests).HasForeignKey(d => d.StudentId);
                 e.HasOne(d => d.ApprovedBy).WithMany().HasForeignKey(d => d.ApprovedById).OnDelete(DeleteBehavior.SetNull);
             });
 
@@ -69,6 +81,11 @@ namespace NeoBoard.Infrastructure.Data
                 e.HasOne(d => d.BorrowRequest).WithMany(p => p.Items).HasForeignKey(d => d.BorrowRequestId);
                 e.HasOne(d => d.Asset).WithMany(p => p.BorrowItems).HasForeignKey(d => d.AssetId).OnDelete(DeleteBehavior.SetNull);
                 e.HasOne(d => d.Toolset).WithMany(p => p.BorrowItems).HasForeignKey(d => d.ToolsetId).OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<MaintenanceTicket>(e => {
+                e.HasOne(d => d.Asset).WithMany().HasForeignKey(d => d.AssetId).OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(d => d.AssignedTechnician).WithMany().HasForeignKey(d => d.AssignedTechnicianId).OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

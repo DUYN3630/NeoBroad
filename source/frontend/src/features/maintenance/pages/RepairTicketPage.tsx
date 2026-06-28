@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import apiClient from '@/lib/axios';
 import { 
-  Wrench, 
-  Search, 
   Calendar, 
-  User,
-  CheckCircle2,
   Clock,
   Printer
 } from 'lucide-react';
@@ -79,7 +74,7 @@ const RepairTicketPage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#1a1a1a]">Phiếu sửa chữa thiết bị</h1>
         <p className="text-gray-500 text-sm">Theo dõi tiến độ sửa chữa và điều phối kỹ thuật viên.</p>
@@ -139,7 +134,7 @@ const RepairTicketPage = () => {
           </tbody>
         </table>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

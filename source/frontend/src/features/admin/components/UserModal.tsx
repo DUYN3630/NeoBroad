@@ -28,7 +28,7 @@ interface UserModalProps {
 const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, initialData }) => {
   const [activeTab, setActiveTab] = useState('account');
   const [formData, setFormData] = useState<AmsUser>({
-    username: '', email: '', fullName: '', employeeCode: '', roleName: 'Employee',
+    username: '', email: '', fullName: '', employeeCode: '', roleName: 'Student',
     department: '', jobTitle: '', phoneNumber: '', address: '', dateOfBirth: '',
     gender: 'Male', isActive: true, password: ''
   });
@@ -36,7 +36,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, initialD
   useEffect(() => {
     if (initialData) setFormData(initialData);
     else setFormData({
-        username: '', email: '', fullName: '', employeeCode: '', roleName: 'Employee',
+        username: '', email: '', fullName: '', employeeCode: '', roleName: 'Student',
         department: '', jobTitle: '', phoneNumber: '', address: '', dateOfBirth: '',
         gender: 'Male', isActive: true, password: ''
     });
@@ -100,10 +100,10 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, initialD
                     <div>
                         <label className="k-label">Vai trò (Role)</label>
                         <select name="roleName" value={formData.roleName} onChange={handleChange} className="k-input font-bold text-[#0072C6]">
-                            <option value="Admin">Quản trị viên (Admin)</option>
-                            <option value="Technician">Kỹ thuật viên (Technician)</option>
-                            <option value="Manager">Quản lý (Manager)</option>
-                            <option value="Employee">Nhân viên (Employee)</option>
+                            <option value="Admin">Quản trị viên (Admin - Role 0)</option>
+                            <option value="Staff">Kỹ thuật viên / Thủ kho (Staff - Role 1)</option>
+                            <option value="Teacher">Giảng viên (Teacher - Role 2)</option>
+                            <option value="Student">Sinh viên (Student - Role 3)</option>
                         </select>
                     </div>
                     <div>

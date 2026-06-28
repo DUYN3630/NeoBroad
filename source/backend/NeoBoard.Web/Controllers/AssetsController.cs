@@ -46,6 +46,22 @@ namespace NeoBoard.Web.Controllers
             asset.CreatedAt = DateTime.UtcNow;
 
             _context.Assets.Add(asset);
+
+            var health = new AssetHealth
+            {
+                Id = Guid.NewGuid(),
+                AssetId = asset.Id,
+                BatteryCycleCount = asset.Type == "Laptop" ? 0 : (int?)null,
+                BatteryHealthPercentage = asset.Type == "Laptop" ? 100 : (int?)null,
+                BulbHoursUsed = asset.Type == "Monitor" && asset.Name.Contains("Projector") ? 0 : (int?)null,
+                MaintenanceCycleDays = asset.MaintenanceIntervalMonths * 30,
+                LastMaintenanceDate = asset.LastMaintenance ?? asset.CreatedAt,
+                NextScheduledMaintenance = (asset.LastMaintenance ?? asset.CreatedAt).AddMonths(asset.MaintenanceIntervalMonths),
+                HealthStatus = asset.Status == "Broken" ? "Critical" : "Good",
+                HealthNotes = asset.Status == "Broken" ? "Thiết bị lỗi hỏng đang chờ xử lý." : "Hoạt động bình thường."
+            };
+            _context.AssetHealths.Add(health);
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetAsset), new { id = asset.Id }, asset);
@@ -65,6 +81,31 @@ namespace NeoBoard.Web.Controllers
             asset.Department = updatedAsset.Department;
             asset.Price = updatedAsset.Price;
             asset.LastMaintenance = updatedAsset.LastMaintenance;
+            asset.AssetCode = updatedAsset.AssetCode;
+            asset.Model = updatedAsset.Model;
+            asset.Location = updatedAsset.Location;
+            asset.Custodian = updatedAsset.Custodian;
+            asset.Manufacturer = updatedAsset.Manufacturer;
+            asset.Supplier = updatedAsset.Supplier;
+            asset.InvoiceNumber = updatedAsset.InvoiceNumber;
+            asset.TechnicalSpecs = updatedAsset.TechnicalSpecs;
+            asset.Notes = updatedAsset.Notes;
+            asset.PurchaseDate = updatedAsset.PurchaseDate;
+            asset.WarrantyMonths = updatedAsset.WarrantyMonths;
+            asset.WarrantyExpiration = updatedAsset.WarrantyExpiration;
+            asset.MaintenanceIntervalMonths = updatedAsset.MaintenanceIntervalMonths;
+            asset.AssignedTechnicianId = updatedAsset.AssignedTechnicianId;
+
+            // Sync AssetHealth
+            var healthRecord = await _context.AssetHealths.FirstOrDefaultAsync(h => h.AssetId == id);
+            if (healthRecord != null)
+            {
+                healthRecord.HealthStatus = asset.Status == "Broken" ? "Critical" : (asset.Status == "Maintenance" ? "Warning" : "Good");
+                healthRecord.HealthNotes = asset.Status == "Broken" 
+                    ? "Thiết bị được báo cáo lỗi hỏng." 
+                    : (asset.Status == "Maintenance" ? "Thiết bị đang được bảo trì." : "Hoạt động bình thường.");
+                _context.AssetHealths.Update(healthRecord);
+            }
 
             await _context.SaveChangesAsync();
 
@@ -77,6 +118,12 @@ namespace NeoBoard.Web.Controllers
             var asset = await _context.Assets.FindAsync(id);
             if (asset == null)
                 return NotFound(new { Message = "Không tìm thấy thiết bị." });
+
+            var healthRecord = await _context.AssetHealths.FirstOrDefaultAsync(h => h.AssetId == id);
+            if (healthRecord != null)
+            {
+                _context.AssetHealths.Remove(healthRecord);
+            }
 
             _context.Assets.Remove(asset);
             await _context.SaveChangesAsync();

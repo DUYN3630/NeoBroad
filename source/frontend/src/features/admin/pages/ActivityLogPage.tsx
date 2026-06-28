@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import apiClient from '@/lib/axios';
 import { 
   History, 
@@ -34,7 +33,7 @@ const ActivityLogPage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#1a1a1a]">Nhật ký hoạt động</h1>
         <p className="text-gray-500 text-sm mt-1">Ghi lại toàn bộ lịch sử tương tác của người dùng trên hệ thống.</p>
@@ -73,7 +72,7 @@ const ActivityLogPage = () => {
             )}
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

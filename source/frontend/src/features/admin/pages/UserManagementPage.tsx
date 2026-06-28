@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import UserModal from '../components/UserModal';
 import apiClient from '@/lib/axios';
 import { 
@@ -61,7 +60,7 @@ const UserManagementPage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý người dùng</h1>
@@ -134,7 +133,7 @@ const UserManagementPage = () => {
         onSave={handleSaveUser}
         initialData={selectedUser}
       />
-    </MainLayout>
+    </>
   );
 };
 

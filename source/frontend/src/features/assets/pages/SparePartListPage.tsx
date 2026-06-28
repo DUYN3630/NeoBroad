@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import SparePartModal from '../components/SparePartModal';
 import apiClient from '@/lib/axios';
+import { useAuthStore } from '@/stores/authStore';
 import { 
   Box, 
   Plus, 
@@ -23,6 +23,9 @@ interface SparePart {
 }
 
 const SparePartListPage = () => {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 0;
+
   const [parts, setParts] = useState<SparePart[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,18 +66,20 @@ const SparePartListPage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Kho phụ tùng thay thế</h1>
           <p className="text-gray-500 text-sm mt-1">Quản lý linh kiện dự phòng cho công tác sửa chữa.</p>
         </div>
-        <button 
-            onClick={() => { setSelectedPart(null); setIsModalOpen(true); }}
-            className="k-button-primary flex items-center text-xs uppercase"
-        >
-          <Plus size={18} className="mr-2" /> Nhập kho mới
-        </button>
+        {isAdmin && (
+          <button 
+              onClick={() => { setSelectedPart(null); setIsModalOpen(true); }}
+              className="k-button-primary flex items-center text-xs uppercase"
+          >
+            <Plus size={18} className="mr-2" /> Nhập kho mới
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
@@ -85,12 +90,12 @@ const SparePartListPage = () => {
               <th className="px-6 py-3">Danh mục</th>
               <th className="px-6 py-3 text-center">Tồn kho</th>
               <th className="px-6 py-3 text-right">Đơn giá</th>
-              <th className="px-6 py-3 text-right">Thao tác</th>
+              {isAdmin && <th className="px-6 py-3 text-right">Thao tác</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
-              [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8"></td></tr>)
+              [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={isAdmin ? 5 : 4} className="px-6 py-8"></td></tr>)
             ) : parts.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
@@ -109,12 +114,14 @@ const SparePartListPage = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right font-bold text-gray-600">{formatCurrency(p.unitPrice)}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                        <button onClick={() => { setSelectedPart(p); setIsModalOpen(true); }} className="p-1 text-gray-400 hover:text-blue-600"><Edit size={16} /></button>
-                        <button className="p-1 text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                          <button onClick={() => { setSelectedPart(p); setIsModalOpen(true); }} className="p-1 text-gray-400 hover:text-blue-600"><Edit size={16} /></button>
+                          <button className="p-1 text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
             ))}
           </tbody>
@@ -127,7 +134,7 @@ const SparePartListPage = () => {
         onSave={handleSavePart}
         initialData={selectedPart}
       />
-    </MainLayout>
+    </>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import apiClient from '@/lib/axios';
 import { 
   Handshake, 
@@ -11,7 +10,8 @@ import {
   User,
   Monitor,
   Calendar,
-  MoreVertical
+  MoreVertical,
+  AlertTriangle
 } from 'lucide-react';
 
 interface BorrowRequest {
@@ -22,6 +22,8 @@ interface BorrowRequest {
   expectedReturnDate: string;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Returned';
   reason: string;
+  totalQuantity?: number;
+  isLargeRequest?: boolean;
 }
 
 const BorrowRequestListPage = () => {
@@ -79,7 +81,7 @@ const BorrowRequestListPage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý mượn thiết bị</h1>
@@ -124,7 +126,14 @@ const BorrowRequestListPage = () => {
                     <div className="flex items-start space-x-3">
                       <div className="p-2 bg-blue-50 text-[#0066cc] rounded-lg"><Handshake size={16} /></div>
                       <div>
-                        <p className="font-bold text-[#1a1a1a]">{req.assetName}</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-bold text-[#1a1a1a]">{req.assetName}</p>
+                          {req.isLargeRequest && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-500 border border-red-100 text-[10px] font-bold rounded-lg uppercase tracking-wider animate-pulse">
+                              <AlertTriangle size={11} /> Số lượng lớn ({req.totalQuantity} món)
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[11px] text-gray-500 flex items-center mt-0.5"><User size={10} className="mr-1" /> {req.userName}</p>
                       </div>
                     </div>
@@ -164,7 +173,7 @@ const BorrowRequestListPage = () => {
           </tbody>
         </table>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

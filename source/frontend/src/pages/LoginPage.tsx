@@ -18,7 +18,7 @@ const LoginPage = () => {
 
   const fetchCaptcha = async () => {
     try {
-      const response = await api.get('/Account/GetCaptcha');
+      const response = await api.get('/Auth/captcha');
       setCaptchaData(response.data);
     } catch (error) {
       console.error('Error fetching captcha:', error);
@@ -35,7 +35,7 @@ const LoginPage = () => {
     setMessage('');
 
     try {
-      const response = await api.post('/Account/Login', {
+      const response = await api.post('/Auth/login', {
         emailOrPhone,
         password,
         captcha,

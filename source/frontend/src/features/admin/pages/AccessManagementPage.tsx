@@ -1,10 +1,9 @@
 import React from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { Lock, ShieldCheck, UserCheck, AlertCircle } from 'lucide-react';
 
 const AccessManagementPage = () => {
   return (
-    <MainLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý quyền truy cập</h1>
         <p className="text-gray-500 text-sm mt-1">Cấu hình các giao thức bảo mật và kiểm soát truy cập hệ thống.</p>
@@ -48,7 +47,7 @@ const AccessManagementPage = () => {
             </div>
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '../components/layout/MainLayout';
-import apiClient from '../api/apiClient';
-import { ClipboardList, User, DollarSign, Tag } from 'lucide-react';
+import apiClient from '@/lib/axios';
+import { ClipboardList, User, DollarSign } from 'lucide-react';
 
 interface Ticket {
   id: number;
@@ -19,12 +18,12 @@ const MaintenanceTicketPage = () => {
 
   useEffect(() => {
     apiClient.get('/Maintenance/Tickets')
-      .then(res => setTickets(res.data))
+      .then((res: any) => setTickets(res.data))
       .finally(() => setLoading(false));
   }, []);
 
   return (
-    <MainLayout>
+    <>
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý Maintenance Ticket</h1>
@@ -77,7 +76,7 @@ const MaintenanceTicketPage = () => {
           </div>
         ))}
       </div>
-    </MainLayout>
+    </>
   );
 };
 

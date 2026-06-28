@@ -44,6 +44,9 @@ namespace NeoBoard.Web.Controllers
 
             toolset.Id = Guid.NewGuid();
             toolset.CreatedAt = DateTime.UtcNow;
+            
+            // Đảm bảo số lượng khả dụng ban đầu bằng tổng số lượng
+            toolset.AvailableQuantity = toolset.TotalQuantity;
 
             _context.Toolsets.Add(toolset);
             await _context.SaveChangesAsync();
@@ -62,10 +65,51 @@ namespace NeoBoard.Web.Controllers
             toolset.Code = updatedToolset.Code;
             toolset.Description = updatedToolset.Description;
             toolset.TotalQuantity = updatedToolset.TotalQuantity;
-            toolset.AvailableQuantity = updatedToolset.AvailableQuantity;
+            
+            // Điều chỉnh số lượng khả dụng dựa trên chênh lệch tổng số lượng mới
+            int difference = updatedToolset.TotalQuantity - toolset.TotalQuantity;
+            toolset.AvailableQuantity = Math.Max(0, toolset.AvailableQuantity + difference);
+
+            toolset.Status = updatedToolset.Status;
+            toolset.Location = updatedToolset.Location;
+            toolset.Custodian = updatedToolset.Custodian;
+            toolset.Supplier = updatedToolset.Supplier;
+            toolset.PurchaseDate = updatedToolset.PurchaseDate;
+            toolset.WarrantyMonths = updatedToolset.WarrantyMonths;
+            toolset.ItemsDetail = updatedToolset.ItemsDetail;
+            toolset.LastMaintenanceDate = updatedToolset.LastMaintenanceDate;
+            toolset.Department = updatedToolset.Department;
 
             await _context.SaveChangesAsync();
 
+            return Ok(toolset);
+        }
+
+        [HttpPut("{id}/ToggleStatus")]
+        public async Task<IActionResult> ToggleStatus(Guid id)
+        {
+            var toolset = await _context.Toolsets.FindAsync(id);
+            if (toolset == null)
+                return NotFound(new { Message = "Không tìm thấy bộ công cụ." });
+
+            if (toolset.Status == "Available")
+            {
+                toolset.Status = "InUse";
+                if (toolset.AvailableQuantity > 0)
+                {
+                    toolset.AvailableQuantity -= 1;
+                }
+            }
+            else
+            {
+                toolset.Status = "Available";
+                if (toolset.AvailableQuantity < toolset.TotalQuantity)
+                {
+                    toolset.AvailableQuantity += 1;
+                }
+            }
+
+            await _context.SaveChangesAsync();
             return Ok(toolset);
         }
 

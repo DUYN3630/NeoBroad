@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import FailureModal from '../components/FailureModal';
 import RepairModal from '../components/RepairModal';
 import apiClient from '@/lib/axios';
+import { useAuthStore } from '@/stores/authStore';
 import { 
   AlertTriangle, 
   Search, 
-  Plus, 
   Clock, 
   User,
   CheckCircle2,
-  MoreHorizontal,
   Wrench
 } from 'lucide-react';
 
@@ -24,6 +22,9 @@ interface FailureTicket {
 }
 
 const FailureTicketPage = () => {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 0;
+
   const [failures, setFailures] = useState<FailureTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFailureModalOpen, setIsFailureModalOpen] = useState(false);
@@ -33,7 +34,7 @@ const FailureTicketPage = () => {
   const fetchFailures = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get('/Maintenance/Failures');
+      const res: any = await apiClient.get('/Maintenance/Failures');
       setFailures(res.data);
     } catch (err) {
       console.error(err);
@@ -59,7 +60,11 @@ const FailureTicketPage = () => {
 
   const handleApproveFailure = async (repairData: any) => {
     try {
-        await apiClient.post('/Maintenance/ApproveFailure', repairData);
+        await apiClient.post('/Maintenance/ApproveFailure', {
+            ...repairData,
+            failureId: selectedFailure?.id,
+            assetId: selectedFailure?.assetId
+        });
         setIsRepairModalOpen(false);
         fetchFailures(); // Cập nhật lại list (trạng thái sẽ đổi sang In Progress)
         alert('Đã phê duyệt và tạo phiếu sửa chữa!');
@@ -82,7 +87,7 @@ const FailureTicketPage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Phiếu báo hỏng thiết bị</h1>
@@ -111,12 +116,12 @@ const FailureTicketPage = () => {
               <th className="px-6 py-4">Người báo</th>
               <th className="px-6 py-4">Mô tả sự cố</th>
               <th className="px-6 py-4">Trạng thái</th>
-              <th className="px-6 py-4 text-right">Thao tác</th>
+              {isAdmin && <th className="px-6 py-4 text-right">Thao tác</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {loading ? (
-              [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8"></td></tr>)
+              [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={isAdmin ? 5 : 4} className="px-6 py-8"></td></tr>)
             ) : failures.length > 0 ? (
               failures.map((f) => (
                 <tr key={f.id} className="hover:bg-red-50/20 transition-colors">
@@ -131,20 +136,22 @@ const FailureTicketPage = () => {
                   </td>
                   <td className="px-6 py-4 text-gray-600 text-xs italic">"{f.description}"</td>
                   <td className="px-6 py-4">{getStatusBadge(f.status)}</td>
-                  <td className="px-6 py-4 text-right">
-                    {f.status === 'Pending' && (
-                        <button 
-                            onClick={() => { setSelectedFailure(f); setIsRepairModalOpen(true); }}
-                            className="bg-blue-50 text-[#0066cc] px-3 py-1.5 rounded-md text-xs font-bold hover:bg-blue-100 flex items-center ml-auto transition-all"
-                        >
-                            <Wrench size={14} className="mr-1.5" /> Duyệt & Sửa
-                        </button>
-                    )}
-                  </td>
+                  {isAdmin && (
+                    <td className="px-6 py-4 text-right">
+                      {f.status === 'Pending' && (
+                          <button 
+                              onClick={() => { setSelectedFailure(f); setIsRepairModalOpen(true); }}
+                              className="bg-blue-50 text-[#0066cc] px-3 py-1.5 rounded-md text-xs font-bold hover:bg-blue-100 flex items-center ml-auto transition-all"
+                          >
+                              <Wrench size={14} className="mr-1.5" /> Duyệt & Sửa
+                          </button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
-              <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic">Hiện tại không có báo cáo hỏng hóc nào.</td></tr>
+              <tr><td colSpan={isAdmin ? 5 : 4} className="px-6 py-12 text-center text-gray-400 italic">Hiện tại không có báo cáo hỏng hóc nào.</td></tr>
             )}
           </tbody>
         </table>
@@ -162,7 +169,7 @@ const FailureTicketPage = () => {
         onApprove={handleApproveFailure}
         failureData={selectedFailure}
       />
-    </MainLayout>
+    </>
   );
 };
 

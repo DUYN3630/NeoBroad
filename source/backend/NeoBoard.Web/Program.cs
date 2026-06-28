@@ -5,7 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +19,9 @@ builder.Services.AddControllersWithViews()
         options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
     });
+
+builder.Services.AddHttpClient();
+builder.Services.AddSignalR();
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -39,6 +46,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -47,6 +56,59 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddKendo();
+
+// Configure Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, _ => new FixedWindowRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            PermitLimit = 100,
+            Window = TimeSpan.FromMinutes(1)
+        });
+    });
+
+    options.AddPolicy("AuthLimit", httpContext =>
+    {
+        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, _ => new FixedWindowRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(1)
+        });
+    });
+});
+
+// Initialize Firebase Admin SDK
+try
+{
+    var credentialPath = builder.Configuration["Firebase:CredentialFilePath"];
+    if (!string.IsNullOrEmpty(credentialPath) && System.IO.File.Exists(credentialPath))
+    {
+        if (FirebaseAdmin.FirebaseApp.DefaultInstance == null)
+        {
+            FirebaseAdmin.FirebaseApp.Create(new FirebaseAdmin.AppOptions
+            {
+                Credential = Google.Apis.Auth.OAuth2.GoogleCredential.FromFile(credentialPath)
+            });
+            Console.WriteLine("[Firebase Admin] Initialized successfully.");
+        }
+    }
+    else
+    {
+        Console.WriteLine($"[Firebase Admin] Credential file not found at: {credentialPath}");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[Firebase Admin Init Error] {ex.Message}");
+}
 
 builder.Services.AddCors(options =>
 {
@@ -71,8 +133,15 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<NeoBoard.Infrastructure.Data.AppDbContext>();
-        await context.Database.MigrateAsync();
-        await NeoBoard.Infrastructure.Data.DbSeeder.SeedAsync(context);
+        var passwordService = services.GetRequiredService<NeoBoard.Application.Common.Interfaces.IPasswordService>();
+        
+        try {
+            await context.Database.MigrateAsync();
+        } catch (Exception ex) {
+            Console.WriteLine($"Migration failed, but proceeding to seeding: {ex.Message}");
+        }
+        
+        await NeoBoard.Infrastructure.Data.DbSeeder.SeedAsync(context, passwordService);
     }
     catch (Exception ex)
     {
@@ -80,6 +149,9 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred while migrating or seeding the database.");
     }
 }
+
+app.UseMiddleware<NeoBoard.Web.Middlewares.SecurityExceptionHandlingMiddleware>();
+app.UseMiddleware<NeoBoard.Web.Middlewares.SecurityHeadersMiddleware>();
 
 app.UseCors("AllowReact");
 
@@ -93,6 +165,7 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseRateLimiter();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -104,5 +177,7 @@ app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
+
+app.MapHub<NeoBoard.Web.Hubs.NotificationHub>("/r/notifications");
 
 app.Run();

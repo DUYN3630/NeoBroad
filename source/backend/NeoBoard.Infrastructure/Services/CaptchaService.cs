@@ -15,7 +15,10 @@ namespace NeoBoard.Infrastructure.Services
             var captchaCode = random.Next(1000, 9999).ToString();
             var captchaID = Guid.NewGuid().ToString();
 
-            var captchaPath = Path.Combine(webRootPath, "shared", "UserFiles", "Captcha");
+            // Fallback to current directory if webRootPath is null
+            var rootPath = webRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            
+            var captchaPath = Path.Combine(rootPath, "shared", "UserFiles", "Captcha");
             if (!Directory.Exists(captchaPath))
             {
                 Directory.CreateDirectory(captchaPath);
@@ -23,16 +26,30 @@ namespace NeoBoard.Infrastructure.Services
 
             var captchaFilePath = Path.Combine(captchaPath, $"{captchaID}.png");
 
-            using (Bitmap bitmap = new Bitmap(150, 60))
-            using (Graphics graphics = Graphics.FromImage(bitmap))
+            try
             {
-                graphics.Clear(Color.White);
-                using (Font font = new Font(FontFamily.GenericSansSerif, 24, FontStyle.Bold))
-                using (Brush brush = new SolidBrush(Color.Black))
+                using (Bitmap bitmap = new Bitmap(150, 60))
+                using (Graphics graphics = Graphics.FromImage(bitmap))
                 {
-                    graphics.DrawString(captchaCode, font, brush, 20, 15);
+                    graphics.Clear(Color.White);
+                    using (Font font = new Font(FontFamily.GenericSansSerif, 24, FontStyle.Bold))
+                    using (Brush brush = new SolidBrush(Color.Black))
+                    {
+                        graphics.DrawString(captchaCode, font, brush, 20, 15);
+                    }
+                    bitmap.Save(captchaFilePath, ImageFormat.Png);
                 }
-                bitmap.Save(captchaFilePath, ImageFormat.Png);
+            }
+            catch (Exception ex)
+            {
+                // If System.Drawing fails, we still return the model but without a generated image
+                // In a real app, we'd log this: Console.WriteLine(ex.Message);
+                return new CaptchaModel
+                {
+                    CaptchaID = captchaID,
+                    Captcha = "", // No image
+                    Code = captchaCode 
+                };
             }
 
             return new CaptchaModel

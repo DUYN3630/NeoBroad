@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import RoleModal from '../components/RoleModal';
 import apiClient from '@/lib/axios';
 import { 
@@ -46,7 +45,7 @@ const RoleManagementPage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý Vai trò & Quyền</h1>
@@ -102,7 +101,7 @@ const RoleManagementPage = () => {
         onSave={handleSaveRole}
         initialData={selectedRole}
       />
-    </MainLayout>
+    </>
   );
 };
 

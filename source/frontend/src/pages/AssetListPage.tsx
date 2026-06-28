@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '../components/layout/MainLayout';
-import apiClient from '../api/apiClient';
-import BorrowModal from '../components/common/BorrowModal';
+import apiClient from '@/lib/axios';
+import BorrowModal from '@/components/common/BorrowModal';
 import { 
   Search, 
   Plus, 
-  Filter, 
   Laptop, 
   Monitor, 
   Printer, 
@@ -41,7 +39,7 @@ const AssetListPage = () => {
   const fetchAssets = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/Assets');
+      const response: any = await apiClient.get('/Assets');
       setAssets(response.data);
       setError(null);
     } catch (err) {
@@ -92,7 +90,7 @@ const AssetListPage = () => {
   );
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý thiết bị</h1>
@@ -154,7 +152,7 @@ const AssetListPage = () => {
                           onClick={() => handleBorrowClick(asset)}
                           className="px-3 py-1.5 bg-blue-50 text-[#0066cc] text-[11px] font-bold rounded-md hover:bg-[#0066cc] hover:text-white transition-all flex items-center"
                         >
-                          <Handshake size={14} className="mr-1" /> Mượn ngay
+                          <Handshake size={14} className="mr-1" /> mượn ngay
                         </button>
                       )}
                       <button className="p-1.5 text-gray-400 hover:text-[#0066cc]"><Edit size={16} /></button>
@@ -179,7 +177,7 @@ const AssetListPage = () => {
           fetchAssets();
         }}
       />
-    </MainLayout>
+    </>
   );
 };
 

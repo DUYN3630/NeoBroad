@@ -1,55 +1,37 @@
-# 🚀 Chiến Lược Deployment — NeoBoard
+# 🚀 Chiến Lược Triển Khai (Deployment) — NeoBoard EDU-AMS
 
-## Môi Trường
+## 1. Môi Trường Triển Khai
 
-| Môi trường | Mục đích | URL |
+| Môi trường | Hạ tầng | Phương thức |
 |---|---|---|
-| **Development** | Local dev | `localhost:5173` / `localhost:5001` |
-| **Staging** | Test trước production | `staging.neoboard.com` |
-| **Production** | Live | `neoboard.com` |
+| **Development** | Local Machine / Docker Compose | Chạy code trực tiếp |
+| **Staging** | VPS (Ubuntu) / Docker | Docker Compose |
+| **Production** | Cloud (AWS/Azure) / K8s | Docker Images + CI/CD |
 
 ---
 
-## Deployment Options
+## 2. Containerization (Docker)
 
-### Option 1: Docker Compose (Recommend cho bắt đầu)
-- Xem `docker-setup.md`
-
-### Option 2: Cloud (Azure / AWS)
-- **Backend**: Azure App Service hoặc AWS ECS
-- **Frontend**: Azure Static Web Apps hoặc AWS S3 + CloudFront
-- **Database**: Azure Database for PostgreSQL hoặc AWS RDS
-
-### Option 3: VPS
-- Nginx reverse proxy
-- PM2 / systemd cho process management
-- Let's Encrypt cho SSL
+Hệ thống được tách thành 4 container chính:
+1. **Frontend:** Chạy Next.js (Node server hoặc static export).
+2. **Backend:** Chạy NestJS API.
+3. **Database:** MySQL 8.0 image.
+4. **Cache/Queue:** Redis image.
 
 ---
 
-## Build Commands
+## 3. Quy Trình CI/CD (GitHub Actions)
 
-```bash
-# Backend - Build production
-cd source/backend
-dotnet publish -c Release -o ./publish
-
-# Frontend - Build production
-cd source/frontend
-npm run build
-# Output: dist/ folder
-```
+Mỗi khi code được push lên nhánh `main`:
+1. **Lint & Test:** Chạy ESLint và Jest.
+2. **Build Image:** Build Docker images cho FE và BE.
+3. **Push Image:** Đẩy images lên Docker Hub hoặc Registry riêng.
+4. **Deploy:** SSH vào server, chạy `docker-compose pull` và `docker-compose up -d`.
 
 ---
 
-## Checklist Deploy Production
+## 4. Bảo Mật & Tối Ưu
 
-- [ ] Environment variables set đầy đủ
-- [ ] Database migration đã chạy
-- [ ] CORS config đúng production domain
-- [ ] JWT secret key strong + unique
-- [ ] HTTPS enabled
-- [ ] Logging cấu hình đúng (không log sensitive data)
-- [ ] Health check endpoint hoạt động
-- [ ] Backup database trước khi deploy
-- [ ] Rollback plan ready
+- **SSL/TLS:** Sử dụng Nginx làm Reverse Proxy và cấu hình **Let's Encrypt** để có HTTPS.
+- **Firewall:** Chỉ mở các cổng cần thiết (80, 443). Cổng 3306 (MySQL) và 6379 (Redis) chỉ cho phép truy cập nội bộ.
+- **Auto-scaling:** Với Backend NestJS, có thể sử dụng PM2 cluster mode hoặc Kubernetes để tự động tăng số lượng tiến trình khi tải cao.

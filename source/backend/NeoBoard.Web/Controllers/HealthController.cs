@@ -29,14 +29,15 @@ namespace NeoBoard.Web.Controllers
                 {
                     return Ok(new { 
                         status = "Success", 
-                        message = "Kết nối PostgreSQL thành công!",
-                        database = _context.Database.GetDbConnection().Database
+                        message = "Kết nối MySQL thành công!",
+                        database = _context.Database.GetDbConnection().Database,
+                        dataSource = _context.Database.GetDbConnection().DataSource
                     });
                 }
                 
                 return StatusCode(500, new { 
                     status = "Error", 
-                    message = "Backend chạy được nhưng không thể kết nối tới PostgreSQL. Kiểm tra lại chuỗi kết nối hoặc Server Postgres." 
+                    message = "Backend chạy được nhưng không thể kết nối tới MySQL. Kiểm tra lại Port (3306/3307) và Database name." 
                 });
             }
             catch (Exception ex)

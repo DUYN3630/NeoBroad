@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Calendar, MessageSquare, AlertCircle } from 'lucide-react';
-import apiClient from '../../api/apiClient';
-import { useAuthStore } from '../../stores/authStore';
+import apiClient from '@/lib/axios';
+import { useAuthStore } from '@/stores/authStore';
 
 interface BorrowModalProps {
   isOpen: boolean;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import ToolsetModal from '../components/ToolsetModal';
 import apiClient from '@/lib/axios';
+import { useAuthStore } from '@/stores/authStore';
 import { 
   Search, 
   Plus, 
@@ -17,16 +17,29 @@ import {
 } from 'lucide-react';
 
 interface Toolset {
-  id: number;
+  id?: string;
+  code: string;
   name: string;
   description: string;
   status: string;
-  quantity: number;
+  totalQuantity: number;
+  availableQuantity: number;
+  location: string;
+  custodian: string;
+  supplier: string;
+  purchaseDate?: string;
+  warrantyMonths: number;
+  itemsDetail: string;
+  lastMaintenanceDate?: string;
+  department?: string;
 }
 
 const API_URL = '/Toolsets';
 
 const ToolsetListPage = () => {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 0;
+
   const [toolsets, setToolsets] = useState<Toolset[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,7 +49,7 @@ const ToolsetListPage = () => {
   const fetchToolsets = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get(API_URL);
+      const response: any = await apiClient.get(API_URL);
       setToolsets(response.data);
     } catch (error) {
       console.error(error);
@@ -49,7 +62,8 @@ const ToolsetListPage = () => {
     fetchToolsets();
   }, []);
 
-  const handleToggleStatus = async (id: number) => {
+  const handleToggleStatus = async (id: string | undefined) => {
+    if (!id) return;
     try {
         await apiClient.put(`${API_URL}/${id}/ToggleStatus`);
         fetchToolsets();
@@ -58,7 +72,7 @@ const ToolsetListPage = () => {
     }
   };
 
-  const handleSaveToolset = async (toolsetData: any) => {
+  const handleSaveToolset = async (toolsetData: Toolset) => {
     try {
       if (toolsetData.id) {
         await apiClient.put(`${API_URL}/${toolsetData.id}`, toolsetData);
@@ -72,7 +86,8 @@ const ToolsetListPage = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string | undefined) => {
+    if (!id) return;
     if (window.confirm('Xóa bộ công cụ này?')) {
       await apiClient.delete(`${API_URL}/${id}`);
       fetchToolsets();
@@ -95,18 +110,20 @@ const ToolsetListPage = () => {
   );
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý Bộ công cụ</h1>
           <p className="text-gray-500 text-sm mt-1">Quản lý và theo dõi việc mượn trả dụng cụ bảo trì.</p>
         </div>
-        <button 
-          onClick={() => { setSelectedToolset(null); setIsModalOpen(true); }}
-          className="bg-[#0066cc] hover:bg-[#0052a3] text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center shadow-sm"
-        >
-          <Plus size={18} className="mr-2" /> Thêm bộ công cụ
-        </button>
+        {isAdmin && (
+          <button 
+            onClick={() => { setSelectedToolset(null); setIsModalOpen(true); }}
+            className="bg-[#0066cc] hover:bg-[#0052a3] text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center shadow-sm"
+          >
+            <Plus size={18} className="mr-2" /> Thêm bộ công cụ
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -136,7 +153,9 @@ const ToolsetListPage = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-mono font-bold text-gray-600">x{t.quantity}</td>
+                  <td className="px-6 py-4 font-mono font-bold text-gray-600">
+                    {t.availableQuantity} / {t.totalQuantity}
+                  </td>
                   <td className="px-6 py-4">{getStatusBadge(t.status)}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end space-x-2">
@@ -148,8 +167,12 @@ const ToolsetListPage = () => {
                       >
                         {t.status === 'Available' ? <><HandMetal size={14} className="mr-1.5" /> Mượn dùng</> : <><RotateCcw size={14} className="mr-1.5" /> Trả lại</>}
                       </button>
-                      <button onClick={() => { setSelectedToolset(t); setIsModalOpen(true); }} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all"><Edit size={16} /></button>
-                      <button onClick={() => handleDelete(t.id)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all"><Trash2 size={16} /></button>
+                      {isAdmin && (
+                        <>
+                          <button onClick={() => { setSelectedToolset(t); setIsModalOpen(true); }} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all"><Edit size={16} /></button>
+                          <button onClick={() => handleDelete(t.id)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all"><Trash2 size={16} /></button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -167,7 +190,7 @@ const ToolsetListPage = () => {
         onSave={handleSaveToolset}
         initialData={selectedToolset}
       />
-    </MainLayout>
+    </>
   );
 };
 

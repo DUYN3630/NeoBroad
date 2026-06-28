@@ -15,15 +15,19 @@ namespace NeoBoard.Infrastructure
         {
             services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
-                    ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection")),
+                    new MySqlServerVersion(new System.Version(8, 0, 31)),
                     b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<ICaptchaService, CaptchaService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISmsService, SmsService>();
+            services.AddScoped<IHashService, HashService>();
+            services.AddScoped<IFileService, FileService>();
+            services.AddHostedService<PredictiveMaintenanceService>();
 
             return services;
         }

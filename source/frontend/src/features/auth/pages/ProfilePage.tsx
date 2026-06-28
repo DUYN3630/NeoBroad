@@ -1,5 +1,4 @@
 import React from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { useAuthStore } from '@/stores/authStore';
 import { 
   User, 
@@ -19,7 +18,7 @@ const ProfilePage = () => {
   const { user, logout } = useAuthStore();
 
   return (
-    <MainLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#1a1a1a]">Thông tin cá nhân</h1>
         <p className="text-gray-500 text-sm mt-1">Quản lý thông tin tài khoản và bảo mật của bạn.</p>
@@ -128,7 +127,7 @@ const ProfilePage = () => {
             </div>
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

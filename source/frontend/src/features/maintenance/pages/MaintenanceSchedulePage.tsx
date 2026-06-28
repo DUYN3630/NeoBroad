@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import ScheduleModal from '../components/ScheduleModal';
 import apiClient from '@/lib/axios';
-import { Calendar, Clock, Plus, Search } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
+import { Calendar, Plus } from 'lucide-react';
 
 interface Schedule {
   id: number;
@@ -13,14 +13,18 @@ interface Schedule {
 }
 
 const MaintenanceSchedulePage = () => {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 0;
+
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [autoScheduling, setAutoScheduling] = useState(false);
 
   const fetchSchedules = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get('/Maintenance/Schedules');
+      const res: any = await apiClient.get('/Maintenance/Schedules');
       setSchedules(res.data);
     } catch (err) {
       console.error(err);
@@ -44,6 +48,19 @@ const MaintenanceSchedulePage = () => {
     }
   };
 
+  const handleAutoSchedule = async () => {
+    setAutoScheduling(true);
+    try {
+      await apiClient.post('/Maintenance/AutoScheduleAll');
+      alert('Đã tự động lập lịch bảo trì cho tất cả thiết bị (gồm 2 thiết bị có lịch hôm nay)!');
+      fetchSchedules();
+    } catch (err) {
+      alert('Lỗi khi tự động lập lịch!');
+    } finally {
+      setAutoScheduling(false);
+    }
+  };
+
   const getStatusStyle = (status: string) => {
     switch(status?.toLowerCase()) {
       case 'scheduled': return 'bg-blue-50 text-blue-600 border-blue-100';
@@ -54,18 +71,29 @@ const MaintenanceSchedulePage = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Quản lý lịch bảo trì</h1>
           <p className="text-gray-500 text-sm mt-1">Theo dõi và lên kế hoạch bảo trì định kỳ cho thiết bị.</p>
         </div>
-        <button 
-            onClick={() => setIsModalOpen(true)}
-            className="bg-[#0066cc] hover:bg-[#0052a3] text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center shadow-sm transition-all"
-        >
-          <Plus size={18} className="mr-2" /> Lập lịch mới
-        </button>
+        {isAdmin && (
+          <div className="flex space-x-3">
+            <button 
+                disabled={autoScheduling}
+                onClick={handleAutoSchedule}
+                className="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-250 px-4 py-2 rounded-lg text-sm font-bold flex items-center shadow-sm transition-all disabled:opacity-50"
+            >
+              {autoScheduling ? 'Đang lập lịch...' : 'Tự động lập lịch nhanh'}
+            </button>
+            <button 
+                onClick={() => setIsModalOpen(true)}
+                className="bg-[#0066cc] hover:bg-[#0052a3] text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center shadow-sm transition-all"
+            >
+              <Plus size={18} className="mr-2" /> Lập lịch mới
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -109,7 +137,7 @@ const MaintenanceSchedulePage = () => {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveSchedule}
       />
-    </MainLayout>
+    </>
   );
 };
 

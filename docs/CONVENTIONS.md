@@ -1,144 +1,94 @@
-# 📏 Coding Conventions — NeoBoard
+# 📜 QUY TẮC PHÁT TRIỂN & TIÊU CHUẨN CODE (CONVENTIONS)
+*Dự án: NeoBoard EDU-AMS (High-Security Edition)*
 
-> Quy ước coding cho toàn bộ dự án. Mọi member (và AI agent) phải tuân thủ.
-
----
-
-## 1. Git Conventions
-
-### Branch Naming
-```
-main              ← Production
-develop           ← Development
-feature/{name}    ← Tính năng mới     (VD: feature/user-management)
-bugfix/{name}     ← Sửa lỗi          (VD: bugfix/login-redirect)
-hotfix/{name}     ← Fix urgent        (VD: hotfix/jwt-expiry)
-```
-
-### Commit Message
-```
-feat: thêm tính năng mới
-fix: sửa lỗi
-docs: cập nhật tài liệu
-style: format code (không thay đổi logic)
-refactor: tái cấu trúc code
-test: thêm/sửa test
-chore: việc lặt vặt (update deps, config)
-```
-
-**Ví dụ:**
-```
-feat: thêm endpoint POST /api/v1/auth/login
-fix: sửa lỗi refresh token không revoke token cũ
-docs: cập nhật API docs cho survey endpoints
-```
+Để đảm bảo dự án có chất lượng Enterprise, dễ bảo trì và gây ấn tượng với Technical Lead/HR, toàn bộ thành viên (hoặc AI trợ giúp) phải tuân thủ các quy tắc sau:
 
 ---
 
-## 2. Backend Conventions (.NET)
+## 1. QUY TẮC ĐẶT TÊN (NAMING CONVENTIONS)
 
-### Naming
-| Thứ | Convention | Ví dụ |
-|---|---|---|
-| Namespace | `NeoBoard.{Layer}.{Feature}` | `NeoBoard.Application.Features.Auth` |
-| Class | PascalCase | `UserService` |
-| Interface | I + PascalCase | `IUserRepository` |
-| Method | PascalCase + Async | `GetUserByIdAsync()` |
-| Property | PascalCase | `FullName` |
-| Private field | _camelCase | `_userRepository` |
-| Constant | PascalCase | `MaxFileSize` |
-| Enum member | PascalCase | `UserRole.Admin` |
+### 1.1 Tên File & Thư mục (Kebab-case)
+*   **Quy tắc:** Sử dụng chữ thường, ngăn cách bởi dấu gạch ngang.
+*   **Ví dụ:** `asset-management/`, `user-profile.controller.ts`, `auth-store.ts`.
+*   **Tại sao?** Đảm bảo tính nhất quán trên mọi hệ điều hành (Windows/Linux) và dễ đọc.
 
-### Code Style
-- Dùng **var** khi type rõ ràng: `var user = new User();`
-- Dùng **explicit type** khi không rõ: `User user = GetUser();`
-- **Async/await** cho tất cả I/O operations
-- **Không dùng** `#region` — chia file nhỏ thay vì dùng region
-- 1 class = 1 file
-- Max 200 dòng / file (nếu hơn → tách)
+### 1.2 Biến & Hàm (Camel-case)
+*   **Quy tắc:** Chữ cái đầu viết thường, các từ sau viết hoa chữ cái đầu.
+*   **Ví dụ:** `const studentName = '...';`, `function getAssetById() { ... }`.
 
-### Controller Convention
-```csharp
-[ApiController]
-[Route("api/v1/[controller]")]
-public class UsersController : ControllerBase
+### 1.3 Class & Interface (Pascal-case)
+*   **Quy tắc:** Viết hoa chữ cái đầu của mọi từ.
+*   **Ví dụ:** `class AssetService { ... }`, `interface UserProfile { ... }`.
+
+### 1.4 Cơ sở dữ liệu (MySQL - Snake-case)
+*   **Table:** Viết hoa chữ cái đầu, số nhiều. Ví dụ: `Users`, `Borrow_Records`.
+*   **Column:** Viết hoa chữ cái đầu (PascalCase) để khớp với Entity trong .NET hoặc Prisma.
+*   **Ví dụ:** `Id`, `Student_Code`, `Created_At`.
+
+---
+
+## 2. QUY TRÌNH LÀM VIỆC VỚI GIT (GIT WORKFLOW)
+
+### 2.1 Thông điệp Commit (Conventional Commits)
+Sử dụng cấu trúc: `<type>(<scope>): <description>`
+*   `feat`: Tính năng mới (ví dụ: `feat(auth): add selfie verification`).
+*   `fix`: Sửa lỗi (ví dụ: `fix(ams): fix auto-gen code logic`).
+*   `docs`: Cập nhật tài liệu.
+*   `refactor`: Cơ cấu lại mã nguồn (không thay đổi tính năng).
+*   `test`: Thêm hoặc sửa test.
+
+### 2.2 Quản lý Nhánh (Branching Strategy)
+*   `main`: Nhánh ổn định để triển khai (Production).
+*   `develop`: Nhánh tích hợp các tính năng mới.
+*   `feature/<name>`: Nhánh làm tính năng mới (ví dụ: `feature/blockchain-ledger`).
+
+---
+
+## 3. CHUẨN API & PHẢN HỒI (API STANDARDS)
+
+Toàn bộ API phải trả về cấu trúc thống nhất để Frontend dễ xử lý:
+```json
 {
-    // GET trước, POST, PUT, PATCH, DELETE sau
-    // Mỗi action return IActionResult hoặc ActionResult<T>
+  "success": true,
+  "message": "Thao tác thành công",
+  "data": { ... },
+  "errors": null
 }
 ```
 
 ---
 
-## 3. Frontend Conventions (React)
+## 4. CÁC QUY TẮC "VÀNG" CHO DỰ ÁN NEOBOARD
 
-### Naming
-| Thứ | Convention | Ví dụ |
-|---|---|---|
-| Component | PascalCase.tsx | `UserCard.tsx` |
-| Hook | use + camelCase | `useAuth.ts` |
-| Utility | camelCase | `formatDate.ts` |
-| Constant | UPPER_SNAKE | `MAX_PAGE_SIZE` |
-| CSS Module | PascalCase.module.css | `UserCard.module.css` |
-| Event handler | handle + Event | `handleSubmit`, `handleClick` |
-| Boolean prop | is/has/can prefix | `isLoading`, `hasError`, `canEdit` |
+### 4.1 Quy tắc Zero-Warning
+*   Không được để lại bất kỳ lỗi ESLint hoặc TypeScript error nào trong mã nguồn trước khi push.
+*   Không sử dụng kiểu `any`. Mọi thứ phải được định nghĩa Type/Interface rõ ràng.
 
-### Code Style
-- **Functional components** only — không dùng class components
-- **Named exports** — không dùng default export (trừ pages)
-- **Destructure props** — `({ user, onEdit }: Props) =>`
-- **Early return** cho conditions
-- Max file 150 dòng (tách component nếu hơn)
-- Import order: React → 3rd party → @/ alias → relative → styles
+### 4.2 Quy tắc Bảo mật (Security First)
+*   **Không bao giờ** commit file `.env` chứa mật khẩu, API key lên Git.
+*   Sử dụng Bcrypt để hash mật khẩu với `saltRounds: 10`.
+*   Mọi giao dịch liên quan đến mượn trả tài sản **BẮT BUỘC** phải có log và mã băm (hash) đẩy lên Blockchain.
 
-### Component Structure
-```tsx
-// 1. Imports
-import { type FC } from 'react';
+### 4.3 Quy tắc Frontend (Next.js/React)
+*   **Component hóa:** Mỗi component không nên dài quá 200 dòng. Nếu dài hơn, hãy tách nhỏ.
+*   **Optimistic UI:** Ưu tiên cập nhật giao diện trước khi API trả về kết quả cho các hành động như Like, Bình luận, hoặc Thay đổi trạng thái nhỏ.
 
-// 2. Types
-interface Props { ... }
-
-// 3. Component
-export const MyComponent: FC<Props> = ({ ... }) => {
-  // 3a. Hooks
-  // 3b. Derived state
-  // 3c. Handlers
-  // 3d. Effects
-  // 3e. Render
-  return ( ... );
-};
-```
+### 4.4 Quy tắc Vòng đời Tài sản (Business Logic)
+*   Mọi thiết bị (Asset) khi được tạo ra phải có thuộc tính `Health_Status`.
+*   Khi trạng thái `Health_Status < 20%`, hệ thống phải chặn không cho mượn và tự động chuyển sang luồng bảo trì.
 
 ---
 
-## 4. API Conventions
-
-| Quy tắc | Giá trị |
-|---|---|
-| Base URL | `/api/v1/` |
-| Resource naming | Số nhiều, lowercase | `/users`, `/surveys` |
-| Nested resource | `/users/{id}/posts` |
-| Pagination | `?page=1&pageSize=20` |
-| Sorting | `?sortBy=createdAt&sortOrder=desc` |
-| Searching | `?search=keyword` |
-| Filtering | `?role=admin&isActive=true` |
+## 5. CÔNG CỤ HỖ TRỢ ĐỒNG BỘ
+*   **Prettier:** Tự động format code khi save.
+*   **Prisma Studio:** Công cụ xem DB trực quan.
+*   **Swagger:** Tự động tạo tài liệu API cho Frontend (truy cập tại `/api/docs`).
 
 ---
 
-## 5. Quy Ước Chung
+## 🧠 BRAINSTORM THÊM CÁC Ý TƯỞNG "PRO" (CỘNG ĐIỂM HR):
 
-### ❌ KHÔNG LÀM
-- Không commit code chưa test
-- Không hardcode credentials/secrets
-- Không `console.log` trong production code
-- Không ignore lỗi TypeScript/ESLint bằng `// @ts-ignore`
-- Không dùng `any` type (trừ trường hợp bất khả kháng)
-- Không sửa file không liên quan khi fix bug
-
-### ✅ LUÔN LÀM
-- Luôn xử lý error cases
-- Luôn validate input
-- Luôn dùng TypeScript strict mode
-- Luôn viết meaningful variable names
-- Luôn ghi debug log khi fix xong lỗi
+1.  **AI Code Reviewer:** Đề xuất tích hợp một tool AI nhỏ để check logic code mỗi khi có Pull Request.
+2.  **Performance Budget:** Quy định dung lượng file ảnh upload (không quá 2MB) và thời gian phản hồi API (không quá 200ms cho các request cơ bản).
+3.  **Documentation-Driven Development:** Viết tài liệu mô tả tính năng (như file này) trước khi bắt đầu code tính năng đó.
+4.  **Error Code Dictionary:** Xây dựng một bảng danh sách mã lỗi (Ví dụ: `E001`: Sai MSSV, `E002`: Thiết bị đang bảo trì) để Frontend hiển thị thông báo đa ngôn ngữ dễ dàng.

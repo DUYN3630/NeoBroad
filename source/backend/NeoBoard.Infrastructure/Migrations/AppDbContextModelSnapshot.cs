@@ -110,26 +110,67 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("id");
 
+                    b.Property<string>("AssetCode")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("assetcode");
+
+                    b.Property<Guid?>("AssignedTechnicianId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("assignedtechnicianid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("createdat");
+
+                    b.Property<string>("Custodian")
+                        .HasColumnType("longtext")
+                        .HasColumnName("custodian");
 
                     b.Property<string>("Department")
                         .HasColumnType("longtext")
                         .HasColumnName("department");
 
+                    b.Property<string>("InvoiceNumber")
+                        .HasColumnType("longtext")
+                        .HasColumnName("invoicenumber");
+
                     b.Property<DateTime?>("LastMaintenance")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("lastmaintenance");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("longtext")
+                        .HasColumnName("location");
+
+                    b.Property<int>("MaintenanceIntervalMonths")
+                        .HasColumnType("int")
+                        .HasColumnName("maintenanceintervalmonths");
+
+                    b.Property<string>("Manufacturer")
+                        .HasColumnType("longtext")
+                        .HasColumnName("manufacturer");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("longtext")
+                        .HasColumnName("model");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("name");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("longtext")
+                        .HasColumnName("notes");
+
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(65,30)")
                         .HasColumnName("price");
+
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("purchasedate");
 
                     b.Property<string>("SerialNumber")
                         .HasColumnType("longtext")
@@ -140,14 +181,91 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("status");
 
+                    b.Property<string>("Supplier")
+                        .HasColumnType("longtext")
+                        .HasColumnName("supplier");
+
+                    b.Property<string>("TechnicalSpecs")
+                        .HasColumnType("longtext")
+                        .HasColumnName("technicalspecs");
+
                     b.Property<string>("Type")
                         .HasColumnType("longtext")
                         .HasColumnName("type");
 
+                    b.Property<DateTime?>("WarrantyExpiration")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("warrantyexpiration");
+
+                    b.Property<int>("WarrantyMonths")
+                        .HasColumnType("int")
+                        .HasColumnName("warrantymonths");
+
                     b.HasKey("Id")
                         .HasName("pk_assets");
 
+                    b.HasIndex("AssignedTechnicianId")
+                        .HasDatabaseName("ix_assets_assignedtechnicianid");
+
                     b.ToTable("assets");
+                });
+
+            modelBuilder.Entity("NeoBoard.Domain.Entities.AssetHealth", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("assetid");
+
+                    b.Property<int?>("BatteryCycleCount")
+                        .HasColumnType("int")
+                        .HasColumnName("batterycyclecount");
+
+                    b.Property<int?>("BatteryHealthPercentage")
+                        .HasColumnType("int")
+                        .HasColumnName("batteryhealthpercentage");
+
+                    b.Property<int?>("BulbHoursUsed")
+                        .HasColumnType("int")
+                        .HasColumnName("bulbhoursused");
+
+                    b.Property<DateTime?>("EstimatedReplacementDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("estimatedreplacementdate");
+
+                    b.Property<string>("HealthNotes")
+                        .HasColumnType("longtext")
+                        .HasColumnName("healthnotes");
+
+                    b.Property<string>("HealthStatus")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("healthstatus");
+
+                    b.Property<DateTime>("LastMaintenanceDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("lastmaintenancedate");
+
+                    b.Property<int>("MaintenanceCycleDays")
+                        .HasColumnType("int")
+                        .HasColumnName("maintenancecycledays");
+
+                    b.Property<DateTime?>("NextScheduledMaintenance")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("nextscheduledmaintenance");
+
+                    b.HasKey("Id")
+                        .HasName("pk_assethealths");
+
+                    b.HasIndex("AssetId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_assethealths_assetid");
+
+                    b.ToTable("assethealths");
                 });
 
             modelBuilder.Entity("NeoBoard.Domain.Entities.BorrowItem", b =>
@@ -212,6 +330,10 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("approvedbyid");
 
+                    b.Property<string>("EvidencePhotoUrl")
+                        .HasColumnType("longtext")
+                        .HasColumnName("evidencephotourl");
+
                     b.Property<DateTime>("ExpectedReturnDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("expectedreturndate");
@@ -219,6 +341,10 @@ namespace NeoBoard.Infrastructure.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("longtext")
                         .HasColumnName("note");
+
+                    b.Property<string>("PreviousHash")
+                        .HasColumnType("longtext")
+                        .HasColumnName("previoushash");
 
                     b.Property<string>("Purpose")
                         .HasColumnType("longtext")
@@ -233,6 +359,14 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("status");
 
+                    b.Property<Guid?>("StudentId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("studentid");
+
+                    b.Property<string>("TransactionHash")
+                        .HasColumnType("longtext")
+                        .HasColumnName("transactionhash");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)")
                         .HasColumnName("userid");
@@ -242,6 +376,9 @@ namespace NeoBoard.Infrastructure.Migrations
 
                     b.HasIndex("ApprovedById")
                         .HasDatabaseName("ix_borrowrequests_approvedbyid");
+
+                    b.HasIndex("StudentId")
+                        .HasDatabaseName("ix_borrowrequests_studentid");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_borrowrequests_userid");
@@ -301,6 +438,79 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasDatabaseName("ix_fileattachments_uploadedbyid");
 
                     b.ToTable("fileattachments");
+                });
+
+            modelBuilder.Entity("NeoBoard.Domain.Entities.MaintenanceTicket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ActionTaken")
+                        .HasColumnType("longtext")
+                        .HasColumnName("actiontaken");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("assetid");
+
+                    b.Property<Guid?>("AssignedTechnicianId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("assignedtechnicianid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("createdat");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("description");
+
+                    b.Property<string>("EvidencePhotoUrl")
+                        .HasColumnType("longtext")
+                        .HasColumnName("evidencephotourl");
+
+                    b.Property<DateTime?>("MaintenanceDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("maintenancedate");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("longtext")
+                        .HasColumnName("notes");
+
+                    b.Property<DateTime>("ScheduledDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("scheduleddate");
+
+                    b.Property<string>("SparePartsUsed")
+                        .HasColumnType("longtext")
+                        .HasColumnName("sparepartsused");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("totalcost");
+
+                    b.Property<string>("VerificationResult")
+                        .HasColumnType("longtext")
+                        .HasColumnName("verificationresult");
+
+                    b.HasKey("Id")
+                        .HasName("pk_maintenancetickets");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("ix_maintenancetickets_assetid");
+
+                    b.HasIndex("AssignedTechnicianId")
+                        .HasDatabaseName("ix_maintenancetickets_assignedtechnicianid");
+
+                    b.ToTable("maintenancetickets");
                 });
 
             modelBuilder.Entity("NeoBoard.Domain.Entities.Notification", b =>
@@ -420,6 +630,49 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasDatabaseName("ix_refreshtokens_userid");
 
                     b.ToTable("refreshtokens");
+                });
+
+            modelBuilder.Entity("NeoBoard.Domain.Entities.Student", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ClassName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("classname");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("createdat");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("longtext")
+                        .HasColumnName("department");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext")
+                        .HasColumnName("email");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("fullname");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("isblocked");
+
+                    b.Property<string>("StudentCode")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("studentcode");
+
+                    b.HasKey("Id")
+                        .HasName("pk_students");
+
+                    b.ToTable("students");
                 });
 
             modelBuilder.Entity("NeoBoard.Domain.Entities.Survey", b =>
@@ -613,18 +866,55 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("createdat");
 
+                    b.Property<string>("Custodian")
+                        .HasColumnType("longtext")
+                        .HasColumnName("custodian");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("longtext")
+                        .HasColumnName("department");
+
                     b.Property<string>("Description")
                         .HasColumnType("longtext")
                         .HasColumnName("description");
+
+                    b.Property<string>("ItemsDetail")
+                        .HasColumnType("longtext")
+                        .HasColumnName("itemsdetail");
+
+                    b.Property<DateTime?>("LastMaintenanceDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("lastmaintenancedate");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("longtext")
+                        .HasColumnName("location");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("name");
 
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("purchasedate");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Supplier")
+                        .HasColumnType("longtext")
+                        .HasColumnName("supplier");
+
                     b.Property<int>("TotalQuantity")
                         .HasColumnType("int")
                         .HasColumnName("totalquantity");
+
+                    b.Property<int>("WarrantyMonths")
+                        .HasColumnType("int")
+                        .HasColumnName("warrantymonths");
 
                     b.HasKey("Id")
                         .HasName("pk_toolsets");
@@ -665,6 +955,10 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("isactive");
 
+                    b.Property<bool>("IsPhoneVerified")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("isphoneverified");
+
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("lastloginat");
@@ -673,6 +967,10 @@ namespace NeoBoard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("passwordhash");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext")
+                        .HasColumnName("phonenumber");
 
                     b.Property<int>("Role")
                         .HasColumnType("int")
@@ -756,6 +1054,29 @@ namespace NeoBoard.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("NeoBoard.Domain.Entities.Asset", b =>
+                {
+                    b.HasOne("NeoBoard.Domain.Entities.User", "AssignedTechnician")
+                        .WithMany()
+                        .HasForeignKey("AssignedTechnicianId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_assets_users_assignedtechnicianid");
+
+                    b.Navigation("AssignedTechnician");
+                });
+
+            modelBuilder.Entity("NeoBoard.Domain.Entities.AssetHealth", b =>
+                {
+                    b.HasOne("NeoBoard.Domain.Entities.Asset", "Asset")
+                        .WithOne("Health")
+                        .HasForeignKey("NeoBoard.Domain.Entities.AssetHealth", "AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_assethealths_assets_assetid");
+
+                    b.Navigation("Asset");
+                });
+
             modelBuilder.Entity("NeoBoard.Domain.Entities.BorrowItem", b =>
                 {
                     b.HasOne("NeoBoard.Domain.Entities.Asset", "Asset")
@@ -792,6 +1113,11 @@ namespace NeoBoard.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_borrowrequests_users_approvedbyid");
 
+                    b.HasOne("NeoBoard.Domain.Entities.Student", "Student")
+                        .WithMany("BorrowRequests")
+                        .HasForeignKey("StudentId")
+                        .HasConstraintName("fk_borrowrequests_students_studentid");
+
                     b.HasOne("NeoBoard.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -800,6 +1126,8 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasConstraintName("fk_borrowrequests_users_userid");
 
                     b.Navigation("ApprovedBy");
+
+                    b.Navigation("Student");
 
                     b.Navigation("User");
                 });
@@ -812,6 +1140,26 @@ namespace NeoBoard.Infrastructure.Migrations
                         .HasConstraintName("fk_fileattachments_users_uploadedbyid");
 
                     b.Navigation("UploadedBy");
+                });
+
+            modelBuilder.Entity("NeoBoard.Domain.Entities.MaintenanceTicket", b =>
+                {
+                    b.HasOne("NeoBoard.Domain.Entities.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_maintenancetickets_assets_assetid");
+
+                    b.HasOne("NeoBoard.Domain.Entities.User", "AssignedTechnician")
+                        .WithMany()
+                        .HasForeignKey("AssignedTechnicianId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_maintenancetickets_users_assignedtechnicianid");
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("AssignedTechnician");
                 });
 
             modelBuilder.Entity("NeoBoard.Domain.Entities.Notification", b =>
@@ -932,11 +1280,18 @@ namespace NeoBoard.Infrastructure.Migrations
             modelBuilder.Entity("NeoBoard.Domain.Entities.Asset", b =>
                 {
                     b.Navigation("BorrowItems");
+
+                    b.Navigation("Health");
                 });
 
             modelBuilder.Entity("NeoBoard.Domain.Entities.BorrowRequest", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("NeoBoard.Domain.Entities.Student", b =>
+                {
+                    b.Navigation("BorrowRequests");
                 });
 
             modelBuilder.Entity("NeoBoard.Domain.Entities.Survey", b =>
