@@ -114,30 +114,47 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
     {
-        var allowedOrigins = new List<string> 
-        { 
-            "http://localhost:5173", 
-            "https://neo-broad.vercel.app" 
-        };
-
-        var envOrigins = builder.Configuration["Cors:AllowedOrigins"] ?? Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
-        if (!string.IsNullOrEmpty(envOrigins))
+        policy.SetIsOriginAllowed(origin =>
         {
-            var origins = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            foreach (var origin in origins)
+            try
             {
-                var trimmed = origin.Trim();
-                if (!allowedOrigins.Contains(trimmed))
+                var uri = new Uri(origin);
+                var host = uri.Host;
+                
+                // Cho phép localhost và 127.0.0.1
+                if (host == "localhost" || host == "127.0.0.1")
+                    return true;
+                    
+                // Cho phép tất cả các domain và subdomain của vercel.app
+                if (host.EndsWith(".vercel.app"))
+                    return true;
+
+                // Cho phép các domain cấu hình động
+                var envOrigins = builder.Configuration["Cors:AllowedOrigins"] ?? Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+                if (!string.IsNullOrEmpty(envOrigins))
                 {
-                    allowedOrigins.Add(trimmed);
+                    var origins = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var o in origins)
+                    {
+                        var trimmed = o.Trim();
+                        if (!string.IsNullOrEmpty(trimmed))
+                        {
+                            try
+                            {
+                                if (new Uri(trimmed).Host == host)
+                                    return true;
+                            }
+                            catch {}
+                        }
+                    }
                 }
             }
-        }
-
-        policy.WithOrigins(allowedOrigins.ToArray())
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+            catch {}
+            return false;
+        })
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
