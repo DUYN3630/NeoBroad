@@ -6,6 +6,7 @@ import { Mail, Lock, LogIn, RefreshCw, ChevronRight } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import sideImage from '@/assets/images/Hinhanhthietbilophoc.jpg';
 import SmsOtpVerification from '../components/SmsOtpVerification';
+import { BACKEND_URL } from '@/lib/config';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ emailOrPhone: '', password: '', captcha: '', captchaID: '' });
@@ -20,7 +21,7 @@ const LoginPage = () => {
       const response = await apiClient.get('/Auth/captcha');
       // API hiện tại trả về URL path: /shared/UserFiles/Captcha/xxx.png
       // Cần nối thêm baseURL nếu cần, hoặc để path tuyệt đối nếu proxy đúng
-      setCaptchaImg(`http://localhost:5054${response.data.captchaImage}`);
+      setCaptchaImg(`${BACKEND_URL}${response.data.captchaImage}`);
       setFormData(prev => ({ ...prev, captchaID: response.data.captchaID }));
     } catch (error) {
       console.error('Failed to fetch captcha');

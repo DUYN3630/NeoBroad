@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
+import { API_BASE_URL } from '@/lib/config';
 
 interface User {
   id: string;
@@ -26,7 +27,7 @@ export const useAuthStore = create<AuthState>()(
         const { user, accessToken } = get();
         if (user && accessToken) {
           try {
-            await axios.post('http://localhost:5054/api/v1/Auth/revoke-tokens', 
+            await axios.post(`${API_BASE_URL}/Auth/revoke-tokens`, 
               { userId: user.id },
               { headers: { Authorization: `Bearer ${accessToken}` } }
             );

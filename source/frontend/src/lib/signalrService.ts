@@ -1,4 +1,5 @@
 import * as signalR from '@microsoft/signalr';
+import { BACKEND_URL } from '@/lib/config';
 
 export interface NotificationPayload {
   id?: string;
@@ -35,7 +36,7 @@ class SignalRService {
   private listeners: { [event: string]: Set<NotificationCallback> } = {};
 
   public startConnection(role: number, userId: string) {
-    const hubUrl = `http://localhost:5054/r/notifications?role=${role}&userId=${userId}`;
+    const hubUrl = `${BACKEND_URL}/r/notifications?role=${role}&userId=${userId}`;
 
     // If connection exists and is already connected or connecting, and the URL is identical, reuse it
     if (

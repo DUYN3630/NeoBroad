@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RefreshCw, LogIn } from 'lucide-react';
+import { API_BASE_URL, BACKEND_URL } from '@/lib/config';
 
 const LoginPage = () => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -12,7 +13,7 @@ const LoginPage = () => {
 
   // Khởi tạo API client với cấu hình CORS
   const api = axios.create({
-    baseURL: 'http://localhost:5054/api/v1',
+    baseURL: API_BASE_URL,
     withCredentials: true
   });
 
@@ -60,7 +61,7 @@ const LoginPage = () => {
       {/* K-CARD EMULATION */}
       <div className="bg-white rounded-[10px] shadow-[0px_4px_15px_rgba(0,0,0,0.2)] w-[400px]"
            style={{ padding: '20px' }}>
-        
+         
         <div className="mb-6">
           <h2 className="text-center text-[#212529]" 
               style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 10px 0' }}>
@@ -120,7 +121,7 @@ const LoginPage = () => {
               <div className="relative border border-[#dee2e6] rounded-[4px] overflow-hidden bg-[#f8f9fa] h-[40px] flex-grow">
                 {captchaData.captchaImage ? (
                   <img 
-                    src={`http://localhost:5054${captchaData.captchaImage}`} 
+                    src={`${BACKEND_URL}${captchaData.captchaImage}`} 
                     alt="captcha" 
                     className="h-full w-full object-contain"
                   />

@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useToastStore } from '@/components/ToastNotification';
 import { signalRService } from '@/lib/signalrService';
+import { BACKEND_URL } from '@/lib/config';
 
 interface BorrowedItem {
   id: string;
@@ -576,7 +577,7 @@ const StudentPortal = () => {
                           <div key={record.id} className="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-center gap-5 group">
                               <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform overflow-hidden border border-gray-100 shrink-0">
                                   {record.evidencePhotoUrl ? (
-                                      <img src={`http://localhost:5054${record.evidencePhotoUrl}`} alt="Evidence" className="w-full h-full object-cover" />
+                                      <img src={`${BACKEND_URL}${record.evidencePhotoUrl}`} alt="Evidence" className="w-full h-full object-cover" />
                                   ) : (
                                       <Package size={24} />
                                   )}
