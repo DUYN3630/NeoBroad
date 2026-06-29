@@ -16,7 +16,8 @@ namespace NeoBoard.Infrastructure
             services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
                     new MySqlServerVersion(new System.Version(8, 0, 31)),
-                    b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+                    b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
+                          .EnableRetryOnFailure()));
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
