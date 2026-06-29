@@ -226,6 +226,7 @@ app.UseRateLimiter();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<NeoBoard.Web.Middlewares.IpRestrictionMiddleware>();
 
 // API attribute routing (cho [ApiController] với [Route("api/v1/...")])
 app.MapControllers();

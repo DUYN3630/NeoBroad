@@ -81,6 +81,10 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, initialD
                             <input type="text" name="username" required value={formData.username} onChange={handleChange} className="k-input pl-10" />
                         </div>
                     </div>
+                    <div>
+                        <label className="k-label">Họ và tên đầy đủ <span className="text-red-500">*</span></label>
+                        <input type="text" name="fullName" required value={formData.fullName} onChange={handleChange} className="k-input" />
+                    </div>
                     {!initialData && (
                         <div>
                             <label className="k-label">Mật khẩu khởi tạo <span className="text-red-500">*</span></label>
@@ -124,10 +128,6 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, initialD
             {/* TAB 2: THÔNG TIN CÁ NHÂN */}
             {activeTab === 'profile' && (
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 animate-in fade-in duration-200">
-                    <div className="col-span-2">
-                        <label className="k-label">Họ và tên đầy đủ <span className="text-red-500">*</span></label>
-                        <input type="text" name="fullName" required value={formData.fullName} onChange={handleChange} className="k-input" />
-                    </div>
                     <div>
                         <label className="k-label">Mã nhân viên</label>
                         <input type="text" name="employeeCode" value={formData.employeeCode} onChange={handleChange} className="k-input" />

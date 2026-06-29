@@ -115,6 +115,46 @@ namespace NeoBoard.Infrastructure.Data
                     context.Toolsets.AddRange(toolsets);
                     await context.SaveChangesAsync();
                 }
+
+                // 5. Seed UserActivities (Nhật ký truy cập)
+                if (!await context.UserActivities.AnyAsync(a => a.Action.StartsWith("LOGIN")))
+                {
+                    Console.WriteLine("Seeding login activities...");
+                    
+                    var adminUser = await context.Users.FirstOrDefaultAsync(u => u.Email == "admin@ams.com");
+                    var staffUser = await context.Users.FirstOrDefaultAsync(u => u.Email == "staff@ams.com");
+
+                    var activities = new List<UserActivity>
+                    {
+                        new UserActivity
+                        {
+                            UserId = adminUser?.Id,
+                            Action = "LOGIN_SUCCESS",
+                            Description = "admin@ams.com (Thành công)",
+                            IpAddress = "192.168.1.1",
+                            CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                        },
+                        new UserActivity
+                        {
+                            UserId = staffUser?.Id,
+                            Action = "LOGIN_SUCCESS",
+                            Description = "tech_01@ams.com (Thành công)",
+                            IpAddress = "113.161.12.34",
+                            CreatedAt = DateTime.UtcNow.AddMinutes(-25)
+                        },
+                        new UserActivity
+                        {
+                            UserId = null,
+                            Action = "LOGIN_DENIED_IP",
+                            Description = "guest_user (Bị từ chối - Giới hạn IP)",
+                            IpAddress = "Unknown",
+                            CreatedAt = DateTime.UtcNow.AddHours(-1)
+                        }
+                    };
+
+                    context.UserActivities.AddRange(activities);
+                    await context.SaveChangesAsync();
+                }
                 
                 Console.WriteLine("--- DATABASE SEEDING COMPLETED ---");
             }

@@ -264,6 +264,57 @@ namespace NeoBoard.Web.Controllers
             });
         }
 
+        [HttpPost("RepairBlockchain")]
+        public async Task<IActionResult> RepairBlockchain()
+        {
+            try
+            {
+                var requests = await _context.BorrowRequests
+                    .Include(r => r.Student)
+                    .Include(r => r.User)
+                    .Include(r => r.Items)
+                        .ThenInclude(i => i.Asset)
+                    .Include(r => r.Items)
+                        .ThenInclude(i => i.Toolset)
+                    .OrderBy(r => r.RequestDate)
+                    .ToListAsync();
+
+                string currentExpectedPreviousHash = "00000000000000000000000000000000";
+
+                foreach (var req in requests)
+                {
+                    var studentCode = req.Student?.StudentCode ?? "USER";
+                    var assetIdsString = string.Join(",", req.Items
+                        .Select(i => i.AssetId.HasValue 
+                            ? i.AssetId.Value.ToString() 
+                            : $"{i.ToolsetId.GetValueOrDefault()}:{i.Quantity}")
+                        .OrderBy(s => s));
+
+                    var calculatedHash = _hashService.ComputeTransactionHash(
+                        studentCode,
+                        assetIdsString,
+                        req.EvidencePhotoUrl ?? string.Empty,
+                        currentExpectedPreviousHash,
+                        req.RequestDate
+                    );
+
+                    req.PreviousHash = currentExpectedPreviousHash;
+                    req.TransactionHash = calculatedHash;
+                    _context.BorrowRequests.Update(req);
+
+                    currentExpectedPreviousHash = calculatedHash;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Đã đồng bộ và xây dựng lại chuỗi băm Blockchain thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Lỗi sửa chữa chuỗi băm", details = ex.Message });
+            }
+        }
+
         [HttpGet("MyRequests/{userId}")]
         public async Task<IActionResult> GetMyRequests(Guid userId)
         {
@@ -415,12 +466,15 @@ namespace NeoBoard.Web.Controllers
                 borrowRequest.RequestDate
             );
 
+            var itemNamesList = new List<string>();
+
             // 6. Thêm các thiết bị lẻ (Assets)
             foreach (var assetId in model.AssetIds)
             {
                 var asset = await _context.Assets.FindAsync(assetId);
                 if (asset != null)
                 {
+                    itemNamesList.Add(asset.Name);
                     borrowRequest.Items.Add(new BorrowItem
                     {
                         Id = Guid.NewGuid(),
@@ -452,6 +506,7 @@ namespace NeoBoard.Web.Controllers
                         toolset.AvailableQuantity -= toolsetItem.Quantity;
                         _context.Toolsets.Update(toolset);
 
+                        itemNamesList.Add($"{toolset.Name} (x{toolsetItem.Quantity})");
                         borrowRequest.Items.Add(new BorrowItem
                         {
                             Id = Guid.NewGuid(),
@@ -477,7 +532,7 @@ namespace NeoBoard.Web.Controllers
                     studentCode = student.StudentCode,
                     totalQuantity = totalQty,
                     isLargeRequest = isLarge,
-                    assetNames = string.Join(", ", borrowRequest.Items.Select(i => i.Asset != null ? i.Asset.Name : (i.Toolset != null ? $"{i.Toolset.Name} (x{i.Quantity})" : "Thiết bị")))
+                    assetNames = itemNamesList.Count > 0 ? string.Join(", ", itemNamesList) : "Thiết bị"
                 };
                 
                 await _hubContext.Clients.Group("Admins").SendAsync("ReceiveNewRequest", payload);

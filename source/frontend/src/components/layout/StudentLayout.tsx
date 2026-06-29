@@ -136,7 +136,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         signalRService.stopConnection();
       };
     }
-  }, [user]);
+  }, [user?.id, user?.role]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

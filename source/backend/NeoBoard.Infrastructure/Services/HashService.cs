@@ -17,8 +17,9 @@ namespace NeoBoard.Infrastructure.Services
 
         public string ComputeTransactionHash(string studentCode, string assetId, string selfieUrl, string previousHash, DateTime timestamp)
         {
-            // Kết hợp các thành phần để tạo chuỗi input cho hash (Blockchain-lite style)
-            string input = $"{studentCode}|{assetId}|{selfieUrl}|{previousHash}|{timestamp.Ticks}";
+            // Định dạng ngày giờ dạng chuẩn giây yyyy-MM-dd HH:mm:ss để tránh mất chính xác khi lưu xuống DB
+            string formattedTime = timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+            string input = $"{studentCode}|{assetId}|{selfieUrl}|{previousHash}|{formattedTime}";
             return ComputeHash(input);
         }
 

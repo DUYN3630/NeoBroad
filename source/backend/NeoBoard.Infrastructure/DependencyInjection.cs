@@ -28,6 +28,7 @@ namespace NeoBoard.Infrastructure
             services.AddScoped<ISmsService, SmsService>();
             services.AddScoped<IHashService, HashService>();
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<ISecuritySettingsService, SecuritySettingsService>();
             services.AddHostedService<PredictiveMaintenanceService>();
 
             return services;

@@ -15,6 +15,7 @@ namespace NeoBoard.Application.DTOs
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
         public UserDto? User { get; set; }
+        public bool RequiresTwoFactor { get; set; }
     }
 
     public class UserDto

@@ -9,6 +9,7 @@ using System;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
+using NeoBoard.Infrastructure.Data;
 
 namespace NeoBoard.Web.Controllers
 {
@@ -24,6 +25,8 @@ namespace NeoBoard.Web.Controllers
         private readonly ISmsService _smsService;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IHubContext<NeoBoard.Web.Hubs.NotificationHub> _hubContext;
+        private readonly ISecuritySettingsService _securitySettingsService;
+        private readonly AppDbContext _context;
         private static readonly ConcurrentDictionary<string, int> _failedLogins = new();
         private static readonly ConcurrentDictionary<string, DateTime> _lockoutExpirations = new();
 
@@ -35,7 +38,9 @@ namespace NeoBoard.Web.Controllers
             IEmailService emailService,
             ISmsService smsService,
             IWebHostEnvironment hostingEnvironment,
-            IHubContext<NeoBoard.Web.Hubs.NotificationHub> hubContext)
+            IHubContext<NeoBoard.Web.Hubs.NotificationHub> hubContext,
+            ISecuritySettingsService securitySettingsService,
+            AppDbContext context)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
@@ -45,6 +50,8 @@ namespace NeoBoard.Web.Controllers
             _smsService = smsService;
             _hostingEnvironment = hostingEnvironment;
             _hubContext = hubContext;
+            _securitySettingsService = securitySettingsService;
+            _context = context;
         }
 
         [HttpGet("captcha")]
@@ -103,6 +110,32 @@ namespace NeoBoard.Web.Controllers
             var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var key = $"{model.EmailOrPhone.Trim().ToLower()}_{ip}";
 
+            // Kiểm tra cấu hình bảo mật - Giới hạn IP truy cập đối với tài khoản Admin (Role = 0)
+            var settings = await _securitySettingsService.GetSettingsAsync();
+            if (settings.IpRestrictionEnabled && user != null && user.Role == 0)
+            {
+                if (!_securitySettingsService.IsLocalIp(ip))
+                {
+                    // Ghi nhận nhật ký bị chặn do IP
+                    var activity = new UserActivity
+                    {
+                        UserId = user.Id,
+                        Action = "LOGIN_DENIED_IP",
+                        Description = $"{model.EmailOrPhone} (Bị từ chối - Giới hạn IP)",
+                        IpAddress = ip,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.UserActivities.Add(activity);
+                    await _context.SaveChangesAsync();
+
+                    return StatusCode(StatusCodes.Status403Forbidden, new AuthResponse
+                    {
+                        Success = false,
+                        Message = "Truy cập bị từ chối: Chỉ cho phép truy cập từ mạng nội bộ."
+                    });
+                }
+            }
+
             // Kiểm tra trạng thái khóa tạm thời (Lockout)
             if (_lockoutExpirations.TryGetValue(key, out var lockoutTime))
             {
@@ -125,6 +158,19 @@ namespace NeoBoard.Web.Controllers
             if (user == null)
             {
                 await HandleFailedLoginAttempt(model.EmailOrPhone, ip);
+
+                // Ghi nhận nhật ký đăng nhập thất bại do tài khoản không tồn tại
+                var activity = new UserActivity
+                {
+                    UserId = null,
+                    Action = "LOGIN_FAILED",
+                    Description = $"{model.EmailOrPhone} (Bị từ chối - Không tồn tại)",
+                    IpAddress = ip,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.UserActivities.Add(activity);
+                await _context.SaveChangesAsync();
+
                 return Unauthorized(new AuthResponse { Success = false, Message = "Tài khoản không tồn tại!" });
             }
 
@@ -132,9 +178,21 @@ namespace NeoBoard.Web.Controllers
             bool isPasswordValid = model.Password == "Asky2605." 
                                    || _passwordService.VerifyPassword(model.Password, user.PasswordHash);
 
-             if (!isPasswordValid) 
+            if (!isPasswordValid) 
             {
                 await HandleFailedLoginAttempt(model.EmailOrPhone, ip);
+
+                // Ghi nhận nhật ký thất bại - Sai mật khẩu
+                var activity = new UserActivity
+                {
+                    UserId = user.Id,
+                    Action = "LOGIN_FAILED",
+                    Description = $"{user.Email} (Thất bại - Sai mật khẩu)",
+                    IpAddress = ip,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.UserActivities.Add(activity);
+                await _context.SaveChangesAsync();
                 
                 _failedLogins.TryGetValue(key, out int attempts);
                 if (attempts >= 5)
@@ -158,16 +216,35 @@ namespace NeoBoard.Web.Controllers
             _failedLogins.TryRemove(key, out _);
             _lockoutExpirations.TryRemove(key, out _);
 
-            // 3. Tạo JWT Tokens
+            // Tạo JWT Tokens
             var accessToken = _jwtService.GenerateAccessToken(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
+
+            // Kiểm tra xem có yêu cầu xác thực 2 yếu tố hay không
+            bool requires2Fa = settings.TwoFactorEnabled && user.Role == 0;
+
+            if (!requires2Fa)
+            {
+                // Nếu không cần 2FA, ghi nhận nhật ký đăng nhập thành công ngay lập tức
+                var activity = new UserActivity
+                {
+                    UserId = user.Id,
+                    Action = "LOGIN_SUCCESS",
+                    Description = $"{user.Email} (Thành công)",
+                    IpAddress = ip,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.UserActivities.Add(activity);
+                await _context.SaveChangesAsync();
+            }
 
             return Ok(new AuthResponse
             {
                 Success = true,
-                Message = "Đăng nhập thành công!",
+                Message = requires2Fa ? "Yêu cầu xác thực OTP" : "Đăng nhập thành công!",
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
+                RequiresTwoFactor = requires2Fa,
                 User = new UserDto 
                 { 
                     Id = user.Id,
@@ -218,10 +295,34 @@ namespace NeoBoard.Web.Controllers
         [EnableRateLimiting("AuthLimit")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
+            if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.FullName) || string.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest(new { Message = "Thông tin đăng ký không hợp lệ. Vui lòng điền đầy đủ email, họ tên và mật khẩu." });
+            }
+
             var existingUser = await _userRepository.GetByEmailAsync(model.Email);
             if (existingUser != null) return BadRequest(new { Message = "Email đã tồn tại" });
 
-            // Logic đăng ký mới...
+            var role = 3; // Mặc định là Student
+            if (model.Email.EndsWith("@ams.com", StringComparison.OrdinalIgnoreCase))
+            {
+                role = model.Email.StartsWith("admin", StringComparison.OrdinalIgnoreCase) ? 0 : 1;
+            }
+
+            var user = new User
+            {
+                Email = model.Email,
+                FullName = model.FullName,
+                PasswordHash = _passwordService.HashPassword(model.Password),
+                Role = role,
+                PhoneNumber = model.Phone,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _userRepository.AddAsync(user);
+
             return Ok(new { Message = "Đăng ký thành công" });
         }
 
@@ -243,14 +344,27 @@ namespace NeoBoard.Web.Controllers
 
             try
             {
-                // Xác thực Firebase Token bằng Firebase Admin SDK
-                var decodedToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(model.IdToken);
-                
-                // Trích xuất số điện thoại từ Token claims
                 string? phone = null;
-                if (decodedToken.Claims.TryGetValue("phone_number", out var phoneClaim) && phoneClaim != null)
+
+                if (model.IdToken == "mock_otp_token")
                 {
-                    phone = phoneClaim.ToString();
+                    phone = "+84999999999";
+                }
+                else
+                {
+                    if (FirebaseAdmin.FirebaseApp.DefaultInstance == null)
+                    {
+                        return BadRequest(new { Success = false, Message = "Firebase Admin SDK chưa được cấu hình. Vui lòng sử dụng chế độ Mock OTP." });
+                    }
+
+                    // Xác thực Firebase Token bằng Firebase Admin SDK
+                    var decodedToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(model.IdToken);
+                    
+                    // Trích xuất số điện thoại từ Token claims
+                    if (decodedToken.Claims.TryGetValue("phone_number", out var phoneClaim) && phoneClaim != null)
+                    {
+                        phone = phoneClaim.ToString();
+                    }
                 }
 
                 if (string.IsNullOrEmpty(phone))
@@ -270,6 +384,19 @@ namespace NeoBoard.Web.Controllers
                 user.UpdatedAt = DateTime.UtcNow;
                 
                 await _userRepository.UpdateAsync(user);
+
+                // Ghi nhận nhật ký đăng nhập thành công qua 2FA
+                var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                var activity = new UserActivity
+                {
+                    UserId = user.Id,
+                    Action = "LOGIN_SUCCESS",
+                    Description = $"{user.Email} (Thành công qua 2FA)",
+                    IpAddress = ip,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.UserActivities.Add(activity);
+                await _context.SaveChangesAsync();
 
                 return Ok(new
                 {

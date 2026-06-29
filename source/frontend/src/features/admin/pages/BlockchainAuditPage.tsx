@@ -38,6 +38,7 @@ const BlockchainAuditPage = () => {
   const [report, setReport] = useState<AuditReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [auditing, setAuditing] = useState(false);
+  const [repairing, setRepairing] = useState(false);
 
   const fetchAuditData = async () => {
     setLoading(true);
@@ -69,6 +70,20 @@ const BlockchainAuditPage = () => {
     }
   };
 
+  const repairChain = async () => {
+    if (!window.confirm("Bạn có chắc chắn muốn tính toán lại và đồng bộ toàn bộ chuỗi băm của các giao dịch? Hành động này sẽ cập nhật các mã băm cũ trong cơ sở dữ liệu để khớp theo định dạng thời gian chuẩn.")) return;
+    setRepairing(true);
+    try {
+      const res = await apiClient.post('/Borrow/RepairBlockchain');
+      alert(res.data.message || 'Đã sửa lỗi chuỗi băm thành công!');
+      fetchAuditData();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Lỗi khi sửa lỗi chuỗi băm.');
+    } finally {
+      setRepairing(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -77,14 +92,26 @@ const BlockchainAuditPage = () => {
           <h1 className="text-2xl font-bold text-[#1a1a1a]">Blockchain Integrity Auditor</h1>
           <p className="text-gray-500 text-sm mt-1">Đối soát mật mã học chống giả mạo trực tiếp cơ sở dữ liệu.</p>
         </div>
-        <button 
-          onClick={runAudit}
-          disabled={auditing}
-          className="bg-[#1a1a1a] hover:bg-[#2b2b2b] text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center shadow-lg transition-all disabled:opacity-50"
-        >
-          <RefreshCw size={14} className={`mr-2 ${auditing ? 'animate-spin' : ''}`} />
-          {auditing ? 'Đang mã hóa đối soát...' : 'Kiểm tra toàn chuỗi'}
-        </button>
+        <div className="flex space-x-3">
+          {!report?.isChainIntact && report?.totalBlocks && report.totalBlocks > 0 && (
+            <button 
+              onClick={repairChain}
+              disabled={repairing || auditing}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center shadow-lg transition-all disabled:opacity-50"
+            >
+              <ShieldCheck size={14} className="mr-2" />
+              {repairing ? 'Đang sửa chuỗi...' : 'Đồng bộ & Sửa lỗi chuỗi'}
+            </button>
+          )}
+          <button 
+            onClick={runAudit}
+            disabled={auditing || repairing}
+            className="bg-[#1a1a1a] hover:bg-[#2b2b2b] text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center shadow-lg transition-all disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={`mr-2 ${auditing ? 'animate-spin' : ''}`} />
+            {auditing ? 'Đang mã hóa đối soát...' : 'Kiểm tra toàn chuỗi'}
+          </button>
+        </div>
       </div>
 
       {/* Global Status Banner */}

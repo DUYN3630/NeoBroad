@@ -40,10 +40,24 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const response: any = await apiClient.post('/Auth/login', formData);
-      const { accessToken, user } = response.data;
+      const { accessToken, user, requiresTwoFactor } = response.data;
       
-      // Lưu tạm phiên đăng nhập để chuyển sang bước SMS OTP
-      setTempAuth({ accessToken, user });
+      if (requiresTwoFactor) {
+        // Lưu tạm phiên đăng nhập để chuyển sang bước SMS OTP
+        setTempAuth({ accessToken, user });
+      } else {
+        // Đăng nhập trực tiếp nếu không yêu cầu 2FA
+        setAuth(accessToken, user);
+        
+        // Chuyển hướng dựa theo role
+        if (user.role === 0 || user.role === 1) {
+          navigate('/'); // Admin & Staff
+        } else if (user.role === 2) {
+          navigate('/teacher/dashboard');
+        } else {
+          navigate('/student/portal');
+        }
+      }
     } catch (error: any) {
       alert(error.response?.data?.message || 'Đăng nhập thất bại!');
       fetchCaptcha();

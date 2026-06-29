@@ -248,7 +248,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         signalRService.stopConnection();
       };
     }
-  }, [user]);
+  }, [user?.id, user?.role]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
