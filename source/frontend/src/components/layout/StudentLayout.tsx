@@ -92,7 +92,8 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       const unsubscribeTimelinePost = signalRService.subscribe('ReceiveTimelinePost', (data) => {
         const title = '📢 BẢNG TIN NEOBOARD';
-        const msg = `${data.authorName} vừa đăng một bài viết mới: "${data.content.length > 60 ? data.content.substring(0, 60) + '...' : data.content}"`;
+        const content = data.content || '';
+        const msg = `${data.authorName} vừa đăng một bài viết mới: "${content.length > 60 ? content.substring(0, 60) + '...' : content}"`;
 
         useToastStore.getState().addToast({
           title,

@@ -24,6 +24,8 @@ export interface Asset {
   notes: string;
   maintenanceIntervalMonths: number;
   assignedTechnicianId?: string;
+  lastMaintenance?: string;
+  createdAt?: string;
 }
 
 interface AssetModalProps {

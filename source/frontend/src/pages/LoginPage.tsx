@@ -121,7 +121,9 @@ const LoginPage = () => {
               <div className="relative border border-[#dee2e6] rounded-[4px] overflow-hidden bg-[#f8f9fa] h-[40px] flex-grow">
                 {captchaData.captchaImage ? (
                   <img 
-                    src={`${BACKEND_URL}${captchaData.captchaImage}`} 
+                    src={captchaData.captchaImage.startsWith('data:') || captchaData.captchaImage.startsWith('http') 
+                      ? captchaData.captchaImage 
+                      : `${BACKEND_URL}${captchaData.captchaImage}`} 
                     alt="captcha" 
                     className="h-full w-full object-contain"
                   />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ToolsetModal from '../components/ToolsetModal';
+import ToolsetModal, { Toolset } from '../components/ToolsetModal';
 import apiClient from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
 import { 
@@ -15,24 +15,6 @@ import {
   HandMetal,
   RotateCcw
 } from 'lucide-react';
-
-interface Toolset {
-  id?: string;
-  code: string;
-  name: string;
-  description: string;
-  status: string;
-  totalQuantity: number;
-  availableQuantity: number;
-  location: string;
-  custodian: string;
-  supplier: string;
-  purchaseDate?: string;
-  warrantyMonths: number;
-  itemsDetail: string;
-  lastMaintenanceDate?: string;
-  department?: string;
-}
 
 const API_URL = '/Toolsets';
 

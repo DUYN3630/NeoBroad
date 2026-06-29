@@ -19,9 +19,12 @@ const LoginPage = () => {
   const fetchCaptcha = async () => {
     try {
       const response = await apiClient.get('/Auth/captcha');
-      // API hiện tại trả về URL path: /shared/UserFiles/Captcha/xxx.png
-      // Cần nối thêm baseURL nếu cần, hoặc để path tuyệt đối nếu proxy đúng
-      setCaptchaImg(`${BACKEND_URL}${response.data.captchaImage}`);
+      const captchaImage = response.data.captchaImage;
+      if (captchaImage && (captchaImage.startsWith('data:') || captchaImage.startsWith('http'))) {
+        setCaptchaImg(captchaImage);
+      } else {
+        setCaptchaImg(`${BACKEND_URL}${captchaImage}`);
+      }
       setFormData(prev => ({ ...prev, captchaID: response.data.captchaID }));
     } catch (error) {
       console.error('Failed to fetch captcha');
