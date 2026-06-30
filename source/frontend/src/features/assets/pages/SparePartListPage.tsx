@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SparePartModal from '../components/SparePartModal';
 import apiClient from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
+import Pagination from '@/components/common/Pagination';
 import { 
   Box, 
   Plus, 
@@ -31,11 +32,16 @@ const SparePartListPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPart, setSelectedPart] = useState<SparePart | null>(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const fetchParts = async () => {
     setLoading(true);
     try {
       const res = await apiClient.get('/SpareParts');
       setParts(res.data);
+      setCurrentPage(1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -65,6 +71,11 @@ const SparePartListPage = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
+  // Paginated parts
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentParts = parts.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -82,7 +93,7 @@ const SparePartListPage = () => {
         )}
       </div>
 
-      <div className="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-t-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="k-grid-header">
@@ -96,7 +107,7 @@ const SparePartListPage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={isAdmin ? 5 : 4} className="px-6 py-8"></td></tr>)
-            ) : parts.map((p) => (
+            ) : currentParts.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
@@ -127,6 +138,13 @@ const SparePartListPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={parts.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <SparePartModal 
         isOpen={isModalOpen}

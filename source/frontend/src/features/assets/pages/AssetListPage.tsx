@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import AssetModal, { Asset } from '../components/AssetModal';
 import apiClient from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
+import Pagination from '@/components/common/Pagination';
 import { 
   Search, 
   Plus, 
@@ -38,11 +39,16 @@ const AssetListPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const fetchAssets = async () => {
     setLoading(true);
     try {
       const response = await apiClient.get(API_URL);
       setAssets(response.data);
+      setCurrentPage(1);
     } catch (error) {
       console.error(error);
     } finally {
@@ -53,6 +59,10 @@ const AssetListPage = () => {
   useEffect(() => {
     fetchAssets();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, filterStatus]);
 
   const handleSaveAsset = async (assetData: any) => {
     try {
@@ -129,6 +139,11 @@ const AssetListPage = () => {
     const matchesStatus = filterStatus === 'All' || a.status === filterStatus;
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  // Paginated assets
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentAssets = filteredAssets.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -232,8 +247,8 @@ const AssetListPage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={isAdmin ? 7 : 6} className="px-6 py-8"></td></tr>)
-            ) : filteredAssets.length > 0 ? (
-              filteredAssets.map((asset) => (
+            ) : currentAssets.length > 0 ? (
+              currentAssets.map((asset) => (
                 <tr key={asset.id} className="hover:bg-blue-50/30 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
@@ -283,6 +298,13 @@ const AssetListPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={filteredAssets.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <AssetModal 
         isOpen={isModalOpen}

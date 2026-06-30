@@ -3,6 +3,7 @@ import FailureModal from '../components/FailureModal';
 import RepairModal from '../components/RepairModal';
 import apiClient from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
+import Pagination from '@/components/common/Pagination';
 import { 
   AlertTriangle, 
   Search, 
@@ -31,11 +32,17 @@ const FailureTicketPage = () => {
   const [isRepairModalOpen, setIsRepairModalOpen] = useState(false);
   const [selectedFailure, setSelectedFailure] = useState<FailureTicket | null>(null);
 
+  // Search & Pagination states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const fetchFailures = async () => {
     setLoading(true);
     try {
       const res: any = await apiClient.get('/Maintenance/Failures');
       setFailures(res.data);
+      setCurrentPage(1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -46,6 +53,10 @@ const FailureTicketPage = () => {
   useEffect(() => {
     fetchFailures();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleSaveFailure = async (data: any) => {
     try {
@@ -86,6 +97,17 @@ const FailureTicketPage = () => {
     }
   };
 
+  // Filter failures
+  const filteredFailures = failures.filter(f => 
+    (f.reportedBy || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (f.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Paginated failures
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentFailures = filteredFailures.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -101,11 +123,17 @@ const FailureTicketPage = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-t-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-100 bg-gray-50/30 flex items-center justify-between">
             <div className="relative w-64">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" placeholder="Tìm phiếu hỏng..." className="pl-9 pr-4 py-1.5 bg-white border border-gray-200 rounded-md text-xs w-full outline-none" />
+                <input 
+                  type="text" 
+                  placeholder="Tìm phiếu hỏng..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 pr-4 py-1.5 bg-white border border-gray-200 rounded-md text-xs w-full outline-none" 
+                />
             </div>
         </div>
 
@@ -122,8 +150,8 @@ const FailureTicketPage = () => {
           <tbody className="divide-y divide-gray-50">
             {loading ? (
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={isAdmin ? 5 : 4} className="px-6 py-8"></td></tr>)
-            ) : failures.length > 0 ? (
-              failures.map((f) => (
+            ) : currentFailures.length > 0 ? (
+              currentFailures.map((f) => (
                 <tr key={f.id} className="hover:bg-red-50/20 transition-colors">
                   <td className="px-6 py-4 font-mono font-bold text-gray-400">#FL-{f.id}</td>
                   <td className="px-6 py-4">
@@ -156,6 +184,13 @@ const FailureTicketPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={filteredFailures.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <FailureModal 
         isOpen={isFailureModalOpen}

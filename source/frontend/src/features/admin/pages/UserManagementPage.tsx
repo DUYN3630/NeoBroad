@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UserModal from '../components/UserModal';
 import apiClient from '@/lib/axios';
+import Pagination from '@/components/common/Pagination';
 import { 
   User, 
   Mail, 
@@ -20,12 +21,17 @@ const UserManagementPage = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const res = await apiClient.get('/Users');
       setUsers(res.data);
+      setCurrentPage(1); // Reset page on data load
     } catch (err) {
       console.error(err);
     } finally {
@@ -59,6 +65,11 @@ const UserManagementPage = () => {
     }
   };
 
+  // Paginated users
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -74,7 +85,7 @@ const UserManagementPage = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-t-xl shadow-sm border-t border-x border-gray-200 overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="k-grid-header">
@@ -88,7 +99,7 @@ const UserManagementPage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8"></td></tr>)
-            ) : users.map((u) => (
+            ) : currentUsers.map((u) => (
                 <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
@@ -126,6 +137,13 @@ const UserManagementPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={users.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <UserModal 
         isOpen={isModalOpen}

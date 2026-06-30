@@ -16,11 +16,31 @@ namespace NeoBoard.Infrastructure.Data
             try 
             {
                 // 1. Danh sách tài khoản chuẩn
+                var sv1Id = Guid.Parse("f4ee38f4-7891-4037-8520-bd2dc6d102c2");
+                var sv2Id = Guid.Parse("00000000-0000-0000-0000-000000000002");
+                var sv3Id = Guid.Parse("00000000-0000-0000-0000-000000000003");
+                var sv4Id = Guid.Parse("00000000-0000-0000-0000-000000000004");
+
                 var seedUsers = new List<(Guid Id, string Email, string Pass, string Name, int Role)>
                 {
                     (Guid.Parse("00000000-0000-0000-0000-000000000001"), "admin@ams.com", "Admin@123", "Super Administrator", 0),
-                    (Guid.NewGuid(), "staff@ams.com", "Staff@123", "Nguyễn Văn Nhân Viên", 1),
-                    (Guid.Parse("f4ee38f4-7891-4037-8520-bd2dc6d102c2"), "sv1001@student.edu.vn", "Student@123", "Sinh Viên Test 1", 3)
+                    (Guid.Parse("00000000-0000-0000-0000-000000000011"), "admin1@ams.com", "Admin@123", "Quản trị viên 1", 0),
+                    (Guid.Parse("00000000-0000-0000-0000-000000000012"), "admin2@ams.com", "Admin@123", "Quản trị viên 2", 0),
+                    (Guid.Parse("00000000-0000-0000-0000-000000000013"), "admin3@ams.com", "Admin@123", "Quản trị viên 3", 0),
+
+                    (Guid.Parse("00000000-0000-0000-0000-000000000021"), "staff@ams.com", "Staff@123", "Nguyễn Văn Nhân Viên", 1),
+                    (Guid.Parse("00000000-0000-0000-0000-000000000022"), "staff1@ams.com", "Staff@123", "Kỹ thuật viên 1", 1),
+                    (Guid.Parse("00000000-0000-0000-0000-000000000023"), "staff2@ams.com", "Staff@123", "Kỹ thuật viên 2", 1),
+                    (Guid.Parse("00000000-0000-0000-0000-000000000024"), "staff3@ams.com", "Staff@123", "Kỹ thuật viên 3", 1),
+
+                    (Guid.Parse("00000000-0000-0000-0000-000000000031"), "teacher1@ams.com", "Teacher@123", "Giảng viên 1", 2),
+                    (Guid.Parse("00000000-0000-0000-0000-000000000032"), "teacher2@ams.com", "Teacher@123", "Giảng viên 2", 2),
+                    (Guid.Parse("00000000-0000-0000-0000-000000000033"), "teacher3@ams.com", "Teacher@123", "Giảng viên 3", 2),
+
+                    (sv1Id, "sv1001@student.edu.vn", "Student@123", "Sinh Viên Test 1", 3),
+                    (sv2Id, "sv1002@student.edu.vn", "Student@123", "Sinh Viên Test 2", 3),
+                    (sv3Id, "sv1003@student.edu.vn", "Student@123", "Sinh Viên Test 3", 3),
+                    (sv4Id, "sv1004@student.edu.vn", "Student@123", "Sinh Viên Test 4", 3)
                 };
 
                 foreach (var item in seedUsers)
@@ -56,17 +76,60 @@ namespace NeoBoard.Infrastructure.Data
                 var studentInfo = await context.Students.FirstOrDefaultAsync(s => s.StudentCode == "SV1001");
                 if (studentInfo == null)
                 {
-                    Console.WriteLine("Seeding Student search record...");
+                    Console.WriteLine("Seeding Student search record 1...");
                     context.Students.Add(new Student {
-                        Id = Guid.Parse("f4ee38f4-7891-4037-8520-bd2dc6d102c2"),
+                        Id = sv1Id,
                         StudentCode = "SV1001",
                         FullName = "Sinh Viên Test 1",
                         ClassName = "DCT1211",
                         Email = "sv1001@student.edu.vn",
                         Department = "CNTT"
                     });
-                    await context.SaveChangesAsync();
                 }
+
+                var studentInfo2 = await context.Students.FirstOrDefaultAsync(s => s.StudentCode == "SV1002");
+                if (studentInfo2 == null)
+                {
+                    Console.WriteLine("Seeding Student search record 2...");
+                    context.Students.Add(new Student {
+                        Id = sv2Id,
+                        StudentCode = "SV1002",
+                        FullName = "Sinh Viên Test 2",
+                        ClassName = "DCT1211",
+                        Email = "sv1002@student.edu.vn",
+                        Department = "CNTT"
+                    });
+                }
+
+                var studentInfo3 = await context.Students.FirstOrDefaultAsync(s => s.StudentCode == "SV1003");
+                if (studentInfo3 == null)
+                {
+                    Console.WriteLine("Seeding Student search record 3...");
+                    context.Students.Add(new Student {
+                        Id = sv3Id,
+                        StudentCode = "SV1003",
+                        FullName = "Sinh Viên Test 3",
+                        ClassName = "DCT1211",
+                        Email = "sv1003@student.edu.vn",
+                        Department = "CNTT"
+                    });
+                }
+
+                var studentInfo4 = await context.Students.FirstOrDefaultAsync(s => s.StudentCode == "SV1004");
+                if (studentInfo4 == null)
+                {
+                    Console.WriteLine("Seeding Student search record 4...");
+                    context.Students.Add(new Student {
+                        Id = sv4Id,
+                        StudentCode = "SV1004",
+                        FullName = "Sinh Viên Test 4",
+                        ClassName = "DCT1211",
+                        Email = "sv1004@student.edu.vn",
+                        Department = "CNTT"
+                    });
+                }
+
+                await context.SaveChangesAsync();
 
                 // 3. Seed Assets (Thiết bị)
                 if (!await context.Assets.AnyAsync())

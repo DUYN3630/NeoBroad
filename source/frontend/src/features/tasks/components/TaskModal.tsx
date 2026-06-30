@@ -28,6 +28,7 @@ interface TaskModalProps {
 const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialData }) => {
   const [activeTab, setActiveTab] = useState('general');
   const [assets, setAssets] = useState<any[]>([]);
+  const [staffUsers, setStaffUsers] = useState<any[]>([]);
   const [formData, setFormData] = useState<WorkTask>({
     taskCode: '', title: '', taskType: 'Maintenance', relatedAssetId: '',
     description: '', priority: 'Normal', status: 'To Do',
@@ -37,6 +38,10 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialD
   useEffect(() => {
     if (isOpen) {
       apiClient.get('/Assets').then(res => setAssets(res.data)).catch(() => {});
+      apiClient.get('/Users').then(res => {
+        const staff = res.data.filter((u: any) => u.roleName === 'Staff' || u.roleName === 'Admin' || u.roleName === 'Teacher');
+        setStaffUsers(staff);
+      }).catch(() => {});
     }
     if (initialData) setFormData(initialData);
     else setFormData({
@@ -120,11 +125,17 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, onSave, initialD
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 animate-in fade-in duration-200">
                     <div>
                         <label className="k-label flex items-center"><User size={12} className="mr-1" /> Người thực hiện chính <span className="text-red-500">*</span></label>
-                        <input type="text" name="assignedTo" required value={formData.assignedTo || ''} onChange={handleChange} className="k-input" placeholder="Tên kỹ thuật viên..." />
+                        <select name="assignedTo" required value={formData.assignedTo || ''} onChange={handleChange} className="k-input font-bold">
+                            <option value="">-- Chọn kỹ thuật viên --</option>
+                            {staffUsers.map(u => <option key={u.id} value={u.fullName}>{u.fullName} ({u.jobTitle})</option>)}
+                        </select>
                     </div>
                     <div>
                         <label className="k-label flex items-center"><User size={12} className="mr-1" /> Người giám sát / Phê duyệt</label>
-                        <input type="text" name="supervisor" value={formData.supervisor || ''} onChange={handleChange} className="k-input" />
+                        <select name="supervisor" value={formData.supervisor || ''} onChange={handleChange} className="k-input">
+                            <option value="">-- Chọn người giám sát --</option>
+                            {staffUsers.map(u => <option key={u.id} value={u.fullName}>{u.fullName} ({u.jobTitle})</option>)}
+                        </select>
                     </div>
                     <div>
                         <label className="k-label flex items-center"><Calendar size={12} className="mr-1" /> Ngày bắt đầu</label>

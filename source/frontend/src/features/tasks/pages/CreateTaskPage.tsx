@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TaskModal from '../components/TaskModal';
 import apiClient from '@/lib/axios';
+import Pagination from '@/components/common/Pagination';
 import { 
   ClipboardCheck, 
   Plus, 
@@ -33,12 +34,18 @@ const CreateTaskPage = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<WorkTask | null>(null);
+  
+  // Search & Pagination states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const fetchTasks = async () => {
     setLoading(true);
     try {
       const res: any = await apiClient.get('/Tasks');
       setTasks(res.data);
+      setCurrentPage(1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -73,6 +80,18 @@ const CreateTaskPage = () => {
     }
   };
 
+  // Filter tasks
+  const filteredTasks = tasks.filter(t => 
+    (t.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (t.taskCode || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (t.assignedTo || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Paginated tasks
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTasks = filteredTasks.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <div className="flex items-center justify-between mb-8">
@@ -91,11 +110,20 @@ const CreateTaskPage = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-t-2xl shadow-sm border-t border-x border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-100 bg-gray-50/30">
           <div className="relative max-w-md">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="text" placeholder="Tìm kiếm task..." className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/10 outline-none transition-all" />
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm task..." 
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/10 outline-none transition-all" 
+            />
           </div>
         </div>
 
@@ -112,8 +140,8 @@ const CreateTaskPage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-10"></td></tr>)
-            ) : tasks.length > 0 ? (
-              tasks.map((task) => (
+            ) : currentTasks.length > 0 ? (
+              currentTasks.map((task) => (
                 <tr key={task.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <p className="font-bold text-gray-900">{task.title}</p>
@@ -122,15 +150,15 @@ const CreateTaskPage = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
                         <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-[10px]">
-                            {task.assignedTo.charAt(0)}
+                            {task.assignedTo ? task.assignedTo.charAt(0) : 'U'}
                         </div>
-                        <span className="font-medium text-gray-700">{task.assignedTo}</span>
+                        <span className="font-medium text-gray-700">{task.assignedTo || 'Chưa phân công'}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center text-gray-500 text-xs">
                         <Calendar size={14} className="mr-2" />
-                        {new Date(task.dueDate).toLocaleDateString('vi-VN')}
+                        {task.dueDate ? new Date(task.dueDate).toLocaleDateString('vi-VN') : 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -151,6 +179,13 @@ const CreateTaskPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={filteredTasks.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <TaskModal 
         isOpen={isModalOpen}

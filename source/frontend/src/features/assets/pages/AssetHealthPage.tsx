@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '@/lib/axios';
+import Pagination from '@/components/common/Pagination';
 import { 
   Activity, 
   Battery, 
@@ -55,6 +56,10 @@ const AssetHealthPage = () => {
   const [analytics, setAnalytics] = useState<HealthAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -69,6 +74,7 @@ const AssetHealthPage = () => {
       if (response.data) {
         setAnalytics(response.data);
       }
+      setCurrentPage(1);
     } catch (error) {
       console.error('Fetch health data error:', error);
     } finally {
@@ -79,6 +85,11 @@ const AssetHealthPage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Paginated health data
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentHealthData = healthData.slice(indexOfFirstItem, indexOfLastItem);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -310,7 +321,7 @@ const AssetHealthPage = () => {
                      </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-xs">
-                     {healthData.map(item => (
+                     {currentHealthData.map(item => (
                         <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                            <td className="px-6 py-4">
                               <p className="font-bold text-gray-900">{item.name}</p>
@@ -344,6 +355,15 @@ const AssetHealthPage = () => {
                      ))}
                   </tbody>
                </table>
+            </div>
+            
+            <div className="p-4 border-t border-gray-100">
+               <Pagination
+                 totalItems={healthData.length}
+                 itemsPerPage={itemsPerPage}
+                 currentPage={currentPage}
+                 onPageChange={setCurrentPage}
+               />
             </div>
          </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { useTranslation } from '@/contexts/LanguageContext';
 import apiClient from '@/lib/axios';
 import { signalRService } from '@/lib/signalrService';
 import { useToastStore, ToastContainer } from '@/components/ToastNotification';
@@ -93,6 +94,7 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle }: SidebarIt
 };
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { language, setLanguage, t } = useTranslation();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
   const { notifications, markAllAsRead, markAsRead, clearAll } = useNotificationStore();
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -265,69 +267,69 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }, []);
 
   const menuItems = [
-    { text: "Dashboard", icon: <Home size={18} />, path: "/" },
+    { text: t("menu_dashboard"), icon: <Home size={18} />, path: "/" },
     { 
-      text: "NeoBoard - Truyền thông", 
+      text: t("menu_communication"), 
       icon: <Layers size={18} />, 
       roles: [0, 1],
       subItems: [
-        { text: "Bảng tin Timeline", path: "/timeline" },
-        { text: "Thông báo công ty", path: "/announcements" },
-        { text: "Khảo sát ý kiến", path: "/surveys" }
+        { text: t("menu_timeline"), path: "/timeline" },
+        { text: t("menu_announcements"), path: "/announcements" },
+        { text: t("menu_surveys"), path: "/surveys" }
       ] 
     },
     { 
-      text: "AMS - Quản lý thiết bị", 
+      text: t("menu_assets_management"), 
       icon: <Database size={18} />, 
       roles: [0, 1],
       subItems: [
-        { text: "Danh sách thiết bị", path: "/assets" },
-        { text: "Quản lý Toolset", path: "/toolsets" },
-        { text: "Duyệt yêu cầu mượn", path: "/assets/requests", roles: [0] },
-        { text: "Quầy giao dịch (Phát đồ)", path: "/assets/counter" },
-        { text: "Sức khỏe thiết bị", path: "/assets/health" },
-        { text: "Lịch bảo trì định kỳ", path: "/maintenance/schedule", roles: [0] }
+        { text: t("menu_assets_list"), path: "/assets" },
+        { text: t("menu_toolsets"), path: "/toolsets" },
+        { text: t("menu_borrow_requests"), path: "/assets/requests", roles: [0] },
+        { text: t("menu_counter"), path: "/assets/counter" },
+        { text: t("menu_assets_health"), path: "/assets/health" },
+        { text: t("menu_maintenance_schedule"), path: "/maintenance/schedule", roles: [0] }
       ] 
     },
     { 
-      text: "AMS - Phiếu bảo trì", 
+      text: t("menu_maintenance_tickets"), 
       icon: <ClipboardList size={18} />, 
       roles: [0, 1],
       subItems: [
-        { text: "Phiếu bảo trì (Maintenance)", path: "/maintenance/tickets" },
-        { text: "Phiếu báo hỏng (Failure)", path: "/maintenance/failures" },
-        { text: "Phiếu sửa chữa (Repair)", path: "/maintenance/repairs" }
+        { text: t("menu_tickets"), path: "/maintenance/tickets" },
+        { text: t("menu_failures"), path: "/maintenance/failures" },
+        { text: t("menu_repairs"), path: "/maintenance/repairs" }
       ] 
     },
     { 
-      text: "AMS - Phân công công việc", 
+      text: t("menu_tasks_management"), 
       icon: <ClipboardCheck size={18} />, 
       roles: [0, 1],
       subItems: [
-        { text: "Nhiệm vụ của tôi", path: "/my-tasks" },
-        { text: "Tạo công việc mới", path: "/tasks/create", roles: [0] },
-        { text: "Theo dõi tiến độ", path: "/tasks/progress", roles: [0] }
+        { text: t("menu_my_tasks"), path: "/my-tasks" },
+        { text: t("menu_create_task"), path: "/tasks/create", roles: [0] },
+        { text: t("menu_track_progress"), path: "/tasks/progress", roles: [0] }
       ] 
     },
     { 
-      text: "Hệ thống & Quyền hạn", 
+      text: t("menu_system_permissions"), 
       icon: <Shield size={18} />, 
       roles: [0],
       subItems: [
-        { text: "Quản lý người dùng", path: "/admin/users" },
-        { text: "Vai trò & Phân quyền", path: "/admin/roles" },
-        { text: "Nhật ký hoạt động", path: "/admin/access" },
-        { text: "Blockchain Auditor", path: "/admin/blockchain" }
+        { text: t("menu_users"), path: "/admin/users" },
+        { text: t("menu_roles"), path: "/admin/roles" },
+        { text: t("menu_activity_logs"), path: "/admin/access" },
+        { text: t("menu_blockchain"), path: "/admin/blockchain" }
       ] 
     },
     { 
-      text: "Báo cáo & Thống kê", 
+      text: t("menu_reports"), 
       icon: <BarChart size={18} />, 
       roles: [0, 1],
       subItems: [
-        { text: "Báo cáo thiết bị", path: "/reports/assets" },
-        { text: "Báo cáo bảo trì", path: "/reports/maintenance" },
-        { text: "Báo cáo công việc", path: "/reports/tasks" }
+        { text: t("menu_reports_assets"), path: "/reports/assets" },
+        { text: t("menu_reports_maintenance"), path: "/reports/maintenance" },
+        { text: t("menu_reports_tasks"), path: "/reports/tasks" }
       ] 
     },
   ];
@@ -415,11 +417,20 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </button>
             <div className="relative hidden md:block">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
-              <input type="text" placeholder="Tìm kiếm tài sản, nghiệp vụ..." className="pl-10 pr-4 py-2 bg-gray-50 border border-transparent rounded-xl text-sm w-72 focus:ring-2 focus:ring-[#0066cc]/10 focus:bg-white focus:border-gray-200 transition-all outline-none" />
+              <input type="text" placeholder={t("search")} className="pl-10 pr-4 py-2 bg-gray-50 border border-transparent rounded-xl text-sm w-72 focus:ring-2 focus:ring-[#0066cc]/10 focus:bg-white focus:border-gray-200 transition-all outline-none" />
             </div>
           </div>
           
           <div className="flex items-center space-x-2 lg:space-x-4">
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLanguage(language === 'vi' ? 'en' : 'vi')}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-50 border border-gray-150 hover:bg-gray-100 hover:border-gray-300 rounded-xl text-xs font-black text-gray-750 transition-all shadow-sm"
+              title={language === 'vi' ? 'Chuyển sang tiếng Anh' : 'Switch to Vietnamese'}
+            >
+              <span>{language === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN'}</span>
+            </button>
+
             <div className="relative" ref={notificationRef}>
               <div 
                 className="relative cursor-pointer text-gray-400 hover:text-[#0066cc] transition-all p-2.5 hover:bg-gray-50 rounded-full" 
@@ -440,17 +451,17 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               {showNoti && (
                 <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                   <div className="px-4 py-2 border-b border-gray-50 flex items-center justify-between">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Hộp thư thông báo</span>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t("notifications_box")}</span>
                     {notifications.length > 0 && (
                       <button onClick={clearAll} className="text-[10px] text-red-500 hover:underline font-bold">
-                        Xóa tất cả
+                        {t("clear_all")}
                       </button>
                     )}
                   </div>
                   <div className="max-h-64 overflow-y-auto">
                     {notifications.length === 0 ? (
                       <div className="px-4 py-6 text-center text-xs text-gray-400 font-medium">
-                        Không có thông báo mới nào
+                        {t("no_new_notifications")}
                       </div>
                     ) : (
                       notifications.map((noti) => (
@@ -505,7 +516,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                {isUserMenuOpen && (
                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                     <div className="px-4 py-3 border-b border-gray-50">
-                      <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Tài khoản truy cập</p>
+                      <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">{t("account_access")}</p>
                       <p className="text-sm font-bold text-gray-900 truncate">{user?.email}</p>
                     </div>
                     
@@ -514,7 +525,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         onClick={() => { navigate('/profile'); setIsUserMenuOpen(false); }}
                         className="w-full flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                       >
-                        <User size={16} className="mr-3 opacity-60" /> Hồ sơ cá nhân
+                        <User size={16} className="mr-3 opacity-60" /> {t("profile")}
                       </button>
 
                       {/* Switch Portal Feature for Admin/Staff */}
@@ -523,14 +534,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                           onClick={() => { navigate('/student/portal'); setIsUserMenuOpen(false); }}
                           className="w-full flex items-center px-4 py-2.5 text-sm font-black text-blue-600 bg-blue-50/50 hover:bg-blue-50 transition-colors"
                         >
-                          <Eye size={16} className="mr-3" /> Xem Portal Sinh viên
+                          <Eye size={16} className="mr-3" /> {t("view_student_portal")}
                         </button>
                       )}
 
                       <button 
                         className="w-full flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 transition-colors"
                       >
-                        <Settings size={16} className="mr-3 opacity-60" /> Cài đặt hệ thống
+                        <Settings size={16} className="mr-3 opacity-60" /> {t("system_settings")}
                       </button>
                     </div>
 
@@ -539,7 +550,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         onClick={handleLogout}
                         className="w-full flex items-center px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
                       >
-                        <LogOut size={16} className="mr-3" /> Đăng xuất
+                        <LogOut size={16} className="mr-3" /> {t("logout")}
                       </button>
                     </div>
                  </div>

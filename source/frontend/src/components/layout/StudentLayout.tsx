@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { useTranslation } from '@/contexts/LanguageContext';
 import { signalRService } from '@/lib/signalrService';
 import { useToastStore, ToastContainer } from '@/components/ToastNotification';
 import { useNotificationStore } from '@/stores/notificationStore';
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 
 const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { language, setLanguage, t } = useTranslation();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -152,8 +154,8 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, []);
 
   const navLinks = [
-    { text: "Bàn làm việc", path: "/student/portal", icon: <LayoutDashboard size={18} /> },
-    { text: "Đăng ký mượn mới", path: "/student/assets", icon: <Calendar size={18} /> },
+    { text: t("desk"), path: "/student/portal", icon: <LayoutDashboard size={18} /> },
+    { text: t("register_borrow"), path: "/student/assets", icon: <Calendar size={18} /> },
   ];
 
   const handleLogout = () => {
@@ -176,7 +178,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-black text-lg tracking-tighter text-gray-900 leading-none">NeoBoard</span>
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Student Portal</span>
+                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{t("student_portal_title")}</span>
                 </div>
               </Link>
 
@@ -204,10 +206,19 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <Search size={16} className="absolute left-3 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                 <input 
                   type="text" 
-                  placeholder="Tìm thiết bị..." 
+                  placeholder={t("find_assets")} 
                   className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-2xl text-sm w-48 focus:ring-2 focus:ring-blue-500/20 focus:bg-white focus:w-64 transition-all outline-none"
                 />
               </div>
+
+              {/* Language Switcher */}
+              <button
+                onClick={() => setLanguage(language === 'vi' ? 'en' : 'vi')}
+                className="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-50 border border-gray-150 hover:bg-gray-100 hover:border-gray-300 rounded-xl text-xs font-black text-gray-700 transition-all shadow-sm"
+                title={language === 'vi' ? 'Chuyển sang tiếng Anh' : 'Switch to Vietnamese'}
+              >
+                <span>{language === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN'}</span>
+              </button>
 
               {/* Notification Bell */}
               <div className="relative" ref={notificationRef}>
@@ -230,17 +241,17 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 {showNoti && (
                   <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                     <div className="px-4 py-2 border-b border-gray-50 flex items-center justify-between">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Hộp thư thông báo</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t("notifications_box")}</span>
                       {notifications.length > 0 && (
                         <button onClick={clearAll} className="text-[10px] text-red-500 hover:underline font-bold">
-                          Xóa tất cả
+                          {t("clear_all")}
                         </button>
                       )}
                     </div>
                     <div className="max-h-64 overflow-y-auto">
                       {notifications.length === 0 ? (
                         <div className="px-4 py-6 text-center text-xs text-gray-400 font-medium">
-                          Không có thông báo mới nào
+                          {t("no_new_notifications")}
                         </div>
                       ) : (
                         notifications.map((noti) => (
@@ -290,7 +301,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 {isUserDropdownOpen && (
                   <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                     <div className="px-5 py-4 border-b border-gray-50">
-                      <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Đang đăng nhập</p>
+                      <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">{t("logged_in_as")}</p>
                       <p className="text-sm font-black text-gray-900 truncate">{user?.fullName}</p>
                       <p className="text-[11px] text-gray-500 truncate">{user?.email}</p>
                     </div>
@@ -302,12 +313,12 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                           onClick={() => navigate('/')}
                           className="w-full flex items-center px-5 py-3 text-sm font-black text-blue-600 bg-blue-50/50 hover:bg-blue-50 transition-colors"
                         >
-                          <ShieldAlert size={18} className="mr-3" /> Quay lại Quản trị
+                          <ShieldAlert size={18} className="mr-3" /> {t("back_to_admin")}
                         </button>
                       )}
                       
                       <button className="w-full flex items-center px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                        <User size={18} className="mr-3 text-gray-400" /> Thông tin cá nhân
+                        <User size={18} className="mr-3 text-gray-400" /> {t("profile")}
                       </button>
                     </div>
 
@@ -316,7 +327,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         onClick={handleLogout}
                         className="w-full flex items-center px-5 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
                       >
-                        <LogOut size={18} className="mr-3" /> Đăng xuất
+                        <LogOut size={18} className="mr-3" /> {t("logout")}
                       </button>
                     </div>
                   </div>
@@ -333,7 +344,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-b border-gray-100 p-4 space-y-2 animate-in slide-in-from-top-2">
+          <div className="md:hidden bg-white border-b border-gray-150 p-4 space-y-2 animate-in slide-in-from-top-2">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
@@ -364,11 +375,11 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Modern Footer for Student Portal */}
       <footer className="bg-white border-t border-gray-100 py-10 mt-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-gray-400 text-sm font-medium">© 2026 NeoBoard EDU-AMS. Tất cả quyền được bảo lưu.</p>
+          <p className="text-gray-400 text-sm font-medium">© 2026 NeoBoard EDU-AMS. {t("all_rights_reserved")}</p>
           <div className="mt-4 flex justify-center space-x-6">
-            <a href="#" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">Hỗ trợ kỹ thuật</a>
-            <a href="#" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">Quy định mượn trả</a>
-            <a href="#" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">Chính sách bảo mật</a>
+            <a href="#" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">{t("technical_support")}</a>
+            <a href="#" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">{t("borrow_rules")}</a>
+            <a href="#" className="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">{t("privacy_policy")}</a>
           </div>
         </div>
       </footer>

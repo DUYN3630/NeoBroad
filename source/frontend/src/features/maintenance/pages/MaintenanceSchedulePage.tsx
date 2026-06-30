@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ScheduleModal from '../components/ScheduleModal';
 import apiClient from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
+import Pagination from '@/components/common/Pagination';
 import { Calendar, Plus } from 'lucide-react';
 
 interface Schedule {
@@ -21,11 +22,16 @@ const MaintenanceSchedulePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [autoScheduling, setAutoScheduling] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const fetchSchedules = async () => {
     setLoading(true);
     try {
       const res: any = await apiClient.get('/Maintenance/Schedules');
       setSchedules(res.data);
+      setCurrentPage(1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -70,6 +76,11 @@ const MaintenanceSchedulePage = () => {
     }
   };
 
+  // Paginated schedules
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentSchedules = schedules.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -96,7 +107,7 @@ const MaintenanceSchedulePage = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-t-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-bold tracking-widest border-b border-gray-200">
@@ -109,8 +120,8 @@ const MaintenanceSchedulePage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={4} className="px-6 py-8"></td></tr>)
-            ) : schedules.length > 0 ? (
-              schedules.map(s => (
+            ) : currentSchedules.length > 0 ? (
+              currentSchedules.map(s => (
                 <tr key={s.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 font-bold text-[#1a1a1a]">#AST-{s.assetId}</td>
                   <td className="px-6 py-4 text-gray-600 flex items-center mt-1">
@@ -131,6 +142,13 @@ const MaintenanceSchedulePage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={schedules.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <ScheduleModal 
         isOpen={isModalOpen}

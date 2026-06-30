@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '@/lib/axios';
+import Pagination from '@/components/common/Pagination';
 import { 
   Calendar, 
   Clock,
-  Printer
+  Printer,
+  Search
 } from 'lucide-react';
 
 interface RepairTicket {
@@ -20,12 +22,31 @@ const RepairTicketPage = () => {
   const [repairs, setRepairs] = useState<RepairTicket[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Search & Pagination states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const fetchRepairs = async () => {
+    setLoading(true);
+    try {
+      const res = await apiClient.get('/Maintenance/Repairs');
+      setRepairs(res.data);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    apiClient.get('/Maintenance/Repairs')
-      .then(res => setRepairs(res.data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
+    fetchRepairs();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -73,6 +94,17 @@ const RepairTicketPage = () => {
     printWindow.document.close();
   };
 
+  // Filter repairs
+  const filteredRepairs = repairs.filter(r => 
+    (r.technicianName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (r.repairDetails || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Paginated repairs
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRepairs = filteredRepairs.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <>
       <div className="mb-6">
@@ -80,7 +112,20 @@ const RepairTicketPage = () => {
         <p className="text-gray-500 text-sm">Theo dõi tiến độ sửa chữa và điều phối kỹ thuật viên.</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-t-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="p-4 border-b border-gray-100 bg-gray-50/30 flex items-center justify-between">
+            <div className="relative w-64">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input 
+                  type="text" 
+                  placeholder="Tìm phiếu sửa chữa..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 pr-4 py-1.5 bg-white border border-gray-200 rounded-md text-xs w-full outline-none" 
+                />
+            </div>
+        </div>
+
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200 text-gray-400 uppercase text-[10px] font-bold tracking-widest">
@@ -95,16 +140,16 @@ const RepairTicketPage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr><td colSpan={6} className="px-6 py-10 text-center text-gray-400">Đang tải dữ liệu...</td></tr>
-            ) : repairs.length > 0 ? (
-              repairs.map((r) => (
+            ) : currentRepairs.length > 0 ? (
+              currentRepairs.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50 transition-colors group">
                   <td className="px-6 py-4 font-mono font-bold text-[#0066cc]">#RP-{r.id}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
                         <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 font-bold">
-                            {r.technicianName.charAt(0)}
+                            {r.technicianName ? r.technicianName.charAt(0) : 'U'}
                         </div>
-                        <span className="font-bold text-gray-700">{r.technicianName}</span>
+                        <span className="font-bold text-gray-700">{r.technicianName || 'N/A'}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 font-bold text-orange-600">{formatCurrency(r.estimatedCost)}</td>
@@ -134,6 +179,13 @@ const RepairTicketPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={filteredRepairs.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </>
   );
 };

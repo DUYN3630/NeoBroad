@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '@/lib/axios';
+import Pagination from '@/components/common/Pagination';
 import { 
   Handshake, 
   Clock, 
@@ -31,12 +32,17 @@ const BorrowRequestListPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const fetchRequests = async () => {
     setLoading(true);
     try {
       // Giả sử API endpoint là /Borrow/Requests
       const response = await apiClient.get('/Borrow/Requests');
       setRequests(response.data);
+      setCurrentPage(1);
     } catch (error) {
       console.error('Error fetching borrow requests:', error);
       // Dữ liệu mẫu nếu API chưa sẵn sàng
@@ -53,6 +59,10 @@ const BorrowRequestListPage = () => {
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -79,6 +89,17 @@ const BorrowRequestListPage = () => {
       fetchRequests();
     }
   };
+
+  // Filter requests
+  const filteredRequests = requests.filter(r => 
+    (r.assetName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (r.userName || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Paginated requests
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRequests = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -119,8 +140,8 @@ const BorrowRequestListPage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [1, 2, 3].map(i => <tr key={i}><td colSpan={5} className="px-6 py-8 text-center text-gray-400 animate-pulse">Đang tải dữ liệu...</td></tr>)
-            ) : requests.length > 0 ? (
-              requests.filter(r => r.assetName.toLowerCase().includes(searchTerm.toLowerCase()) || r.userName.toLowerCase().includes(searchTerm.toLowerCase())).map((req) => (
+            ) : currentRequests.length > 0 ? (
+              currentRequests.map((req) => (
                 <tr key={req.id} className="hover:bg-blue-50/30 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-start space-x-3">
@@ -173,6 +194,13 @@ const BorrowRequestListPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={filteredRequests.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </>
   );
 };

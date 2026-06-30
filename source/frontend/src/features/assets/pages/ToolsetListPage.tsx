@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ToolsetModal, { Toolset } from '../components/ToolsetModal';
 import apiClient from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
+import Pagination from '@/components/common/Pagination';
 import { 
   Search, 
   Plus, 
@@ -28,11 +29,16 @@ const ToolsetListPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedToolset, setSelectedToolset] = useState<Toolset | null>(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const fetchToolsets = async () => {
     setLoading(true);
     try {
       const response: any = await apiClient.get(API_URL);
       setToolsets(response.data);
+      setCurrentPage(1);
     } catch (error) {
       console.error(error);
     } finally {
@@ -43,6 +49,10 @@ const ToolsetListPage = () => {
   useEffect(() => {
     fetchToolsets();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleToggleStatus = async (id: string | undefined) => {
     if (!id) return;
@@ -88,8 +98,13 @@ const ToolsetListPage = () => {
   };
 
   const filteredToolsets = toolsets.filter(t => 
-    t.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    (t.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Paginated toolsets
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentToolsets = filteredToolsets.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -108,7 +123,7 @@ const ToolsetListPage = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-t-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50 border-b border-gray-200 text-gray-400 uppercase text-[10px] font-bold tracking-widest">
             <tr>
@@ -121,8 +136,8 @@ const ToolsetListPage = () => {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={4} className="px-6 py-8"></td></tr>)
-            ) : filteredToolsets.length > 0 ? (
-              filteredToolsets.map((t) => (
+            ) : currentToolsets.length > 0 ? (
+              currentToolsets.map((t) => (
                 <tr key={t.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
@@ -165,6 +180,13 @@ const ToolsetListPage = () => {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        totalItems={filteredToolsets.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <ToolsetModal 
         isOpen={isModalOpen}
