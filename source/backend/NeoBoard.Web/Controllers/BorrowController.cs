@@ -336,10 +336,43 @@ namespace NeoBoard.Web.Controllers
                          || r.StudentId == userId 
                          || (studentId.HasValue && r.StudentId == studentId.Value))
                 .Include(r => r.Items)
-                .ThenInclude(i => i.Asset)
+                    .ThenInclude(i => i.Asset)
+                .Include(r => r.Items)
+                    .ThenInclude(i => i.Toolset)
                 .OrderByDescending(r => r.RequestDate)
                 .ToListAsync();
-            return Ok(requests);
+
+            var result = requests.Select(r => new {
+                id = r.Id.ToString(),
+                status = r.Status,
+                requestDate = r.RequestDate,
+                expectedReturnDate = r.ExpectedReturnDate,
+                evidencePhotoUrl = r.EvidencePhotoUrl,
+                transactionHash = r.TransactionHash,
+                items = r.Items.Select(item => new {
+                    id = item.Id.ToString(),
+                    assetId = item.AssetId,
+                    toolsetId = item.ToolsetId,
+                    quantity = item.Quantity,
+                    actualReturnDate = item.ActualReturnDate,
+                    conditionOnBorrow = item.ConditionOnBorrow,
+                    conditionOnReturn = item.ConditionOnReturn,
+                    asset = item.Asset != null ? new {
+                        id = item.Asset.Id.ToString(),
+                        name = item.Asset.Name,
+                        serialNumber = item.Asset.SerialNumber,
+                        type = item.Asset.Type,
+                        status = item.Asset.Status
+                    } : null,
+                    toolset = item.Toolset != null ? new {
+                        id = item.Toolset.Id.ToString(),
+                        name = item.Toolset.Name,
+                        code = item.Toolset.Code
+                    } : null
+                }).ToList()
+            }).ToList();
+
+            return Ok(result);
         }
 
         [HttpGet("StudentPortalSummary/{studentCode}")]

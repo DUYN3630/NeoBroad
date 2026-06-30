@@ -21,7 +21,12 @@ builder.Services.AddControllersWithViews()
     });
 
 builder.Services.AddHttpClient();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+});
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -207,10 +212,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseCors("AllowReact");
+
 app.UseMiddleware<NeoBoard.Web.Middlewares.SecurityExceptionHandlingMiddleware>();
 app.UseMiddleware<NeoBoard.Web.Middlewares.SecurityHeadersMiddleware>();
-
-app.UseCors("AllowReact");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

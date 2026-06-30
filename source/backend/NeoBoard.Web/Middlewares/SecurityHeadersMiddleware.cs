@@ -33,7 +33,7 @@ namespace NeoBoard.Web.Middlewares
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                 "font-src 'self' data: https://fonts.gstatic.com; " +
                 "img-src 'self' data: blob: *; " +
-                "connect-src 'self' ws: wss: http://localhost:* https://*.googleapis.com https://identitytoolkit.googleapis.com; " +
+                "connect-src 'self' ws: wss: http://localhost:* https://*.googleapis.com https://identitytoolkit.googleapis.com https://neoboard.onrender.com https://neo-broad.vercel.app; " +
                 "frame-src 'self' https://www.google.com; " +
                 "media-src 'self';");
 
