@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using NeoBoard.Infrastructure.Data;
 using System;
 using System.Threading.Tasks;
@@ -11,10 +12,53 @@ namespace NeoBoard.Web.Controllers
     public class HealthController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IDistributedCache _cache;
 
-        public HealthController(AppDbContext context)
+        public HealthController(AppDbContext context, IDistributedCache cache)
         {
             _context = context;
+            _cache = cache;
+        }
+
+        [HttpGet("redis")]
+        public async Task<IActionResult> CheckRedis()
+        {
+            try
+            {
+                var testKey = "health:test";
+                var testVal = DateTime.UtcNow.ToString("o");
+                
+                // Try writing to Redis
+                await _cache.SetStringAsync(testKey, testVal, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
+                });
+
+                // Try reading from Redis
+                var readVal = await _cache.GetStringAsync(testKey);
+
+                if (readVal == testVal)
+                {
+                    return Ok(new {
+                        status = "Success",
+                        message = "Kết nối Redis thành công và thao tác Đọc/Ghi hoạt động tốt!",
+                        timestamp = readVal
+                    });
+                }
+
+                return StatusCode(500, new {
+                    status = "Error",
+                    message = "Thao tác Đọc/Ghi trên Redis không đồng bộ hoặc không khớp."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new {
+                    status = "Exception",
+                    message = $"Không thể kết nối đến Redis: {ex.Message}",
+                    detail = ex.InnerException?.Message
+                });
+            }
         }
 
         [HttpGet("database")]

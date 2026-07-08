@@ -1,36 +1,54 @@
-# 🧪 Chiến Lược Kiểm Thử — NeoBoard EDU-AMS
+# 🧪 Chiến Lược Kiểm Thử — NeoBoard (EDU-AMS)
 
-Dự án áp dụng mô hình kiểm thử phân tầng để đảm bảo độ tin cậy của hệ thống quản lý tài sản.
+Dự án áp dụng mô hình kiểm thử phân tầng nghiêm ngặt để đảm bảo chất lượng, tính an toàn và bảo mật của hệ thống quản lý tài sản doanh nghiệp.
 
-## 1. Unit Testing (Kiểm thử đơn vị)
-- **Backend:** Sử dụng **Jest** (mặc định trong NestJS).
-  - Kiểm tra logic của Service (Ví dụ: Thuật toán gen mã tài sản, tính ngày bảo trì).
-- **Frontend:** Sử dụng **Vitest** + **React Testing Library**.
-  - Kiểm tra các component UI (Button, Input, Form validation).
-
-## 2. Integration Testing (Kiểm thử tích hợp)
-- Kiểm tra sự phối hợp giữa Service và Database (sử dụng một database MySQL test riêng).
-- Kiểm tra luồng Mượn/Trả có đảm bảo Transaction hoạt động đúng không.
-
-## 3. E2E Testing (Kiểm thử toàn quy trình)
-- **Công cụ:** **Playwright**.
-- **Kịch bản chính:**
-  - Sinh viên Đăng nhập -> Quét mã QR -> Nhấn mượn -> Kiểm tra trạng thái máy đã đổi sang "Borrowed" chưa.
-  - Admin thêm thiết bị mới -> Kiểm tra mã tài sản có tự sinh đúng chuẩn không.
+> [!IMPORTANT]
+> Để xem chi tiết các kịch bản kiểm thử cho từng module nghiệp vụ (Auth, AMS Core, Borrow/Return, Blockchain, Kanban Maintenance, SignalR), vui lòng đọc tài liệu **[Kế hoạch Kiểm thử Toàn diện hệ thống (system-testing-plan.md)](file:///d:/ĐỒ ÁN/NeoBoard/docs/04-testing/system-testing-plan.md)**.
 
 ---
 
-## 4. Các Lệnh Chạy Test
+## 1. Các Tầng Kiểm Thử (Testing Layers)
 
-- **Backend:**
-  - `npm run test` (Chạy toàn bộ unit test).
-  - `npm run test:cov` (Xem độ bao phủ - Coverage).
-- **Frontend:**
-  - `npm run test` (Chạy vitest).
+### 1.1 Unit Testing (Kiểm thử đơn vị)
+*   **Backend (.NET 9):** Sử dụng **xUnit** + **Moq** + **FluentAssertions**.
+    *   Tập trung kiểm thử logic nghiệp vụ độc lập tại tầng Domain và Application (ví dụ: thuật toán tự sinh mã tài sản, công thức tính điểm sức khỏe thiết bị, băm giao dịch Blockchain).
+*   **Frontend (React 19):** Sử dụng **Vitest** + **React Testing Library**.
+    *   Kiểm thử hành vi của các component giao diện (AssetModal, ToolsetModal, TaskForm) và trạng thái global store (Zustand).
+
+### 1.2 Integration Testing (Kiểm thử tích hợp)
+*   **Backend Database:** Sử dụng **Testcontainers for .NET** chạy container MySQL 8.0 độc lập cho mỗi phiên chạy test tích hợp database.
+*   **Backend API:** Sử dụng **WebApplicationFactory** để kiểm thử tích hợp các REST API endpoint thông qua HTTP Client ảo trong bộ nhớ.
+*   **Frontend API Mocking:** Sử dụng **Mock Service Worker (MSW)** để chặn và trả về dữ liệu mock chuẩn hóa ở mức mạng.
+
+### 1.3 End-to-End Testing (Kiểm thử toàn quy trình - E2E)
+*   **Công cụ:** **Playwright** (chạy đa luồng, hỗ trợ giả lập giao diện di động cho cổng sinh viên/giảng viên và giả lập quét QR code).
 
 ---
 
-## 5. Tiêu Chuẩn Hoàn Thành (Definition of Done)
-- Code mới phải có Unit Test đi kèm.
-- Độ bao phủ (Code Coverage) tối thiểu 70%.
-- Toàn bộ E2E test cho luồng Mượn/Trả phải vượt qua (Pass) trước khi Release.
+## 2. Các Lệnh Chạy Test
+
+### 2.1 Backend (.NET)
+```bash
+# Khởi chạy toàn bộ test suite (Unit & Integration)
+dotnet test source/backend/NeoBoard.sln
+
+# Chạy test và thu thập độ bao phủ code (Coverage)
+dotnet test source/backend/NeoBoard.sln /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+```
+
+### 2.2 Frontend (React)
+```bash
+# Chạy Vitest trong chế độ watch
+cd source/frontend
+npm run test
+
+# Chạy test một lần duy nhất và thu thập độ bao phủ code
+npm run test -- --run --coverage
+```
+
+---
+
+## 3. Tiêu Chuẩn Hoàn Thành (Definition of Done)
+*   Mọi tính năng mới hoặc bản sửa lỗi (bug fix) phải đi kèm unit test / integration test.
+*   Độ bao phủ code (Coverage) phải đạt tối thiểu **85%** đối với Domain/Application backend và **70%** đối với Frontend UI.
+*   Tất cả các bài kiểm tra E2E tự động phải vượt qua (Pass) 100% trước khi merge Pull Request vào các nhánh `develop` và `main`.

@@ -19,7 +19,13 @@ namespace NeoBoard.Infrastructure
                     b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
                           .EnableRetryOnFailure()));
 
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<UserRepository>();
+            services.AddScoped<IUserRepository>(provider => 
+                new CachedUserRepository(
+                    provider.GetRequiredService<UserRepository>(),
+                    provider.GetRequiredService<Microsoft.Extensions.Caching.Distributed.IDistributedCache>(),
+                    provider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<CachedUserRepository>>()
+                ));
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<ICaptchaService, CaptchaService>();

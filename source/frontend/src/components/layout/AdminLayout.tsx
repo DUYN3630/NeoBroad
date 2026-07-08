@@ -35,11 +35,79 @@ interface SidebarItemProps {
   subItems?: { text: string; path: string; roles?: number[] }[];
   isOpen?: boolean;
   onToggle?: () => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (val: boolean) => void;
 }
 
-const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle }: SidebarItemProps) => {
+const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed, setIsCollapsed }: SidebarItemProps) => {
   const location = useLocation();
   const isActive = path ? location.pathname === path : subItems?.some(s => location.pathname === s.path);
+
+  if (isCollapsed) {
+    return (
+      <div className="mb-1.5 relative group flex justify-center">
+        {path ? (
+          <NavLink 
+            to={path}
+            className={({ isActive }) => `flex items-center justify-center w-11 h-11 transition-all duration-200 rounded-xl ${
+              isActive 
+                ? 'bg-[#0066cc] text-white shadow-md shadow-blue-200' 
+                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          >
+            <span>{icon}</span>
+          </NavLink>
+        ) : (
+          <div 
+            onClick={() => {
+              setIsCollapsed(false);
+              if (onToggle && !isOpen) onToggle();
+            }}
+            className={`flex items-center justify-center w-11 h-11 cursor-pointer transition-all duration-200 rounded-xl ${
+              isActive
+                ? 'bg-blue-50 text-[#0066cc]' 
+                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          >
+            <span>{icon}</span>
+          </div>
+        )}
+        
+        {/* Tooltip for items without sub-items */}
+        {!subItems && (
+          <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 shadow-md">
+            {text}
+          </div>
+        )}
+
+        {/* Floating Submenu for items with sub-items */}
+        {subItems && (
+          <div className="absolute left-full top-0 pl-3 hidden group-hover:block z-50">
+            <div className="bg-white border border-gray-200 rounded-xl shadow-xl py-2 min-w-[180px] text-left">
+              <div className="px-4 py-1.5 text-[10px] font-black text-gray-400 uppercase border-b border-gray-100 mb-1">
+                {text}
+              </div>
+              <div className="space-y-0.5">
+                {subItems.map((sub, i) => (
+                  <Link
+                    key={i}
+                    to={sub.path}
+                    className={`block px-4 py-2 text-xs transition-all ${
+                      location.pathname === sub.path
+                        ? 'bg-blue-50 text-[#0066cc] font-black'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    {sub.text}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="mb-1">
@@ -49,7 +117,7 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle }: SidebarIt
           className={({ isActive }) => `flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-200 rounded-xl mx-2 ${
             isActive 
               ? 'bg-[#0066cc] text-white shadow-lg shadow-blue-100' 
-              : 'text-gray-600 hover:bg-gray-100'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
           }`}
         >
           <div className="flex items-center space-x-3">
@@ -63,7 +131,7 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle }: SidebarIt
           className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-200 rounded-xl mx-2 ${
             isActive && !isOpen
               ? 'bg-blue-50 text-[#0066cc]' 
-              : 'text-gray-500 hover:bg-gray-50'
+              : 'text-gray-500 hover:bg-gray-105 hover:text-gray-900'
           }`}
         >
           <div className="flex items-center space-x-3">
@@ -99,7 +167,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { notifications, markAllAsRead, markAsRead, clearAll } = useNotificationStore();
   const unreadCount = notifications.filter(n => !n.read).length;
   const [showNoti, setShowNoti] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -252,6 +321,22 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   }, [user?.id, user?.role]);
 
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
+  // Handle window resize to clean up mobile states
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -371,22 +456,51 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     navigate('/login');
   };
 
+  const handleToggleSidebar = () => {
+    if (window.innerWidth >= 1024) {
+      setIsCollapsed(!isCollapsed);
+    } else {
+      setIsMobileOpen(!isMobileOpen);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#f4f7fa]">
-      {!isSidebarOpen && (
-        <div className="fixed inset-0 bg-black/20 z-40 lg:hidden backdrop-blur-sm" onClick={() => setIsSidebarOpen(true)}></div>
+      {/* Mobile Backdrop */}
+      {isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300" 
+          onClick={() => setIsMobileOpen(false)}
+        ></div>
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[280px] bg-white border-r border-gray-200 flex flex-col shadow-sm transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-[#0066cc]">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-md">
+      <aside 
+        className={`fixed lg:static inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col shadow-sm transition-all duration-300 ${
+          isMobileOpen 
+            ? 'translate-x-0 w-[260px]' 
+            : '-translate-x-full lg:translate-x-0'
+        } ${
+          isCollapsed ? 'lg:w-[76px]' : 'lg:w-[260px]'
+        }`}
+      >
+        <div className={`h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-[#0066cc] transition-all duration-300 shrink-0 ${isCollapsed ? 'lg:px-4' : 'px-6'}`}>
+          <Link to="/" className="flex items-center space-x-2 overflow-hidden">
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-md shrink-0">
               <span className="text-[#0066cc] font-bold text-xl">N</span>
             </div>
-            <span className="font-bold text-lg tracking-tight text-white uppercase">NeoBoard SaaS</span>
+            {!isCollapsed && (
+              <span className="font-bold text-lg tracking-tight text-white uppercase whitespace-nowrap animate-in fade-in duration-300">
+                NeoBoard SaaS
+              </span>
+            )}
           </Link>
-          <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white/70 p-1 hover:bg-white/10 rounded-md"><X size={20} /></button>
+          <button 
+            onClick={() => setIsMobileOpen(false)} 
+            className="lg:hidden text-white/70 p-1 hover:bg-white/10 rounded-md"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <div className="flex-grow overflow-y-auto py-6 scrollbar-hide">
@@ -396,23 +510,35 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               {...item}
               isOpen={openMenus.includes(item.text)}
               onToggle={() => toggleMenu(item.text)}
+              isCollapsed={isCollapsed}
+              setIsCollapsed={setIsCollapsed}
             />
           ))}
         </div>
 
-        <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-           <div className="p-3 bg-white rounded-xl border border-gray-100 text-center shadow-sm">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">NeoBoard EDU-AMS</p>
-              <p className="text-[9px] text-gray-300">Version 2.0.26 Beta</p>
-           </div>
+        <div className="p-4 border-t border-gray-100 bg-gray-50/50 shrink-0">
+           {isCollapsed ? (
+             <div className="text-center font-black text-gray-450 text-[10px]" title="NeoBoard EDU-AMS v2.0.26 Beta">
+               V2
+             </div>
+           ) : (
+             <div className="p-3 bg-white rounded-xl border border-gray-100 text-center shadow-sm animate-in fade-in duration-300">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">NeoBoard EDU-AMS</p>
+                <p className="text-[9px] text-gray-300">Version 2.0.26 Beta</p>
+             </div>
+           )}
         </div>
       </aside>
 
       {/* Header & Content */}
       <div className="flex-grow flex flex-col overflow-hidden relative">
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shadow-sm z-20">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shadow-sm z-20 shrink-0">
           <div className="flex items-center space-x-4">
-            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-gray-50 rounded-xl text-gray-400 transition-colors">
+            <button 
+              onClick={handleToggleSidebar} 
+              className="p-2 hover:bg-gray-50 rounded-xl text-gray-400 transition-colors"
+              title={isCollapsed ? "Mở rộng menu" : "Thu gọn menu"}
+            >
                 <Menu size={20} />
             </button>
             <div className="relative hidden md:block">
