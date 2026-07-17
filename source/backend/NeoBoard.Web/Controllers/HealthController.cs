@@ -28,34 +28,34 @@ namespace NeoBoard.Web.Controllers
                 var testKey = "health:test";
                 var testVal = DateTime.UtcNow.ToString("o");
                 
-                // Try writing to Redis
+                // Try writing to Cache
                 await _cache.SetStringAsync(testKey, testVal, new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
                 });
 
-                // Try reading from Redis
+                // Try reading from Cache
                 var readVal = await _cache.GetStringAsync(testKey);
 
                 if (readVal == testVal)
                 {
                     return Ok(new {
                         status = "Success",
-                        message = "Kết nối Redis thành công và thao tác Đọc/Ghi hoạt động tốt!",
+                        message = "Kiểm tra Cache bộ nhớ tạm (In-Memory Cache) thành công và hoạt động tốt!",
                         timestamp = readVal
                     });
                 }
 
                 return StatusCode(500, new {
                     status = "Error",
-                    message = "Thao tác Đọc/Ghi trên Redis không đồng bộ hoặc không khớp."
+                    message = "Thao tác Đọc/Ghi trên Cache bộ nhớ tạm không đồng bộ hoặc không khớp."
                 });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new {
                     status = "Exception",
-                    message = $"Không thể kết nối đến Redis: {ex.Message}",
+                    message = $"Không thể tương tác với Cache bộ nhớ tạm: {ex.Message}",
                     detail = ex.InnerException?.Message
                 });
             }

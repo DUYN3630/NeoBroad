@@ -24,5 +24,6 @@ namespace NeoBoard.Application.DTOs
         public string Email { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         public int Role { get; set; }
+        public string? StudentCode { get; set; }
     }
 }

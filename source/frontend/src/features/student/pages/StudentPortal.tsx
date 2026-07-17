@@ -680,13 +680,21 @@ const StudentPortal = () => {
             <div className="lg:col-span-4 space-y-6">
                 <div className="bg-white p-6 rounded-2xl border border-gray-150 shadow-sm text-center">
                     <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Mã định danh mượn đồ</h4>
-                    <div className="w-32 h-32 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto border-2 border-dashed border-gray-200 shadow-inner mb-4 relative group cursor-pointer">
-                        <QrCode size={80} className="text-gray-800" />
-                        <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-blue-600">MSSV: SV1001</span>
+                    <div className="w-32 h-32 bg-white rounded-2xl flex items-center justify-center mx-auto border border-gray-200 shadow-sm mb-4 relative group cursor-pointer overflow-hidden p-2">
+                        {user?.studentCode ? (
+                            <img 
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${user.studentCode}`} 
+                                alt={`QR Code ${user.studentCode}`} 
+                                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                            />
+                        ) : (
+                            <QrCode size={80} className="text-gray-400 animate-pulse" />
+                        )}
+                        <div className="absolute inset-0 bg-white/80 backdrop-blur-[1px] rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-[#0066cc]">MSSV: {user?.studentCode || 'N/A'}</span>
                         </div>
                     </div>
-                    <p className="text-lg font-black text-gray-900 tracking-tighter">SV1001</p>
+                    <p className="text-lg font-black text-gray-900 tracking-tighter">{user?.studentCode || 'Chưa cập nhật'}</p>
                     <p className="text-[9px] text-gray-400 font-bold uppercase mt-1 leading-relaxed">
                       Đưa mã này cho Thủ kho tại quầy <br/>để duyệt nhận & trả thiết bị nhanh.
                     </p>

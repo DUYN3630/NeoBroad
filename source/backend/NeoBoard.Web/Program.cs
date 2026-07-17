@@ -51,11 +51,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "NeoBoard_";
-});
+builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {

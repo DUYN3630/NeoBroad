@@ -8,6 +8,7 @@ interface User {
   email: string;
   fullName: string;
   role: number;
+  studentCode?: string;
 }
 
 interface AuthState {

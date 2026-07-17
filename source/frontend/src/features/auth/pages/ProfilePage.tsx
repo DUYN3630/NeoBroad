@@ -17,6 +17,16 @@ import {
 const ProfilePage = () => {
   const { user, logout } = useAuthStore();
 
+  const getRoleName = (role: number | undefined) => {
+    switch (role) {
+      case 0: return 'Quản trị hệ thống';
+      case 1: return 'Thủ kho / IT';
+      case 2: return 'Giảng viên';
+      case 3: return 'Sinh viên';
+      default: return 'Người dùng';
+    }
+  };
+
   return (
     <>
       <div className="mb-8">
@@ -38,8 +48,15 @@ const ProfilePage = () => {
                 </div>
                 <h2 className="text-xl font-bold text-[#1a1a1a]">{user?.fullName}</h2>
                 <p className="text-gray-400 text-sm mb-6">{user?.email}</p>
-                <div className="flex items-center justify-center space-x-2">
-                    <span className="px-3 py-1 bg-blue-50 text-[#0066cc] text-[10px] font-bold rounded-full uppercase tracking-wider">Quản trị viên</span>
+                <div className="flex flex-col items-center justify-center space-y-2">
+                    <span className="px-3 py-1 bg-blue-50 text-[#0066cc] text-[10px] font-bold rounded-full uppercase tracking-wider">
+                        {getRoleName(user?.role)}
+                    </span>
+                    {user?.role === 3 && user?.studentCode && (
+                        <span className="px-3 py-1 bg-gray-50 text-gray-600 text-[10px] font-bold rounded-full uppercase tracking-wider border border-gray-150">
+                            MSSV: {user.studentCode}
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -80,6 +97,15 @@ const ProfilePage = () => {
                             <span className="text-sm font-bold text-gray-700">{user?.email}</span>
                         </div>
                     </div>
+                    {user?.role === 3 && (
+                        <div>
+                            <label className="block text-[11px] font-bold text-gray-400 uppercase mb-2">Mã số sinh viên (MSSV)</label>
+                            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl border border-gray-100 opacity-70">
+                                <Shield size={16} className="text-gray-400" />
+                                <span className="text-sm font-bold text-gray-700">{user?.studentCode || 'Chưa cập nhật'}</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

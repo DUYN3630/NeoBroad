@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 using NeoBoard.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace NeoBoard.Web.Controllers
 {
@@ -238,6 +239,13 @@ namespace NeoBoard.Web.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            string? studentCode = null;
+            if (user.Role == 3)
+            {
+                var student = await _context.Students.FirstOrDefaultAsync(s => s.Email.ToLower() == user.Email.ToLower());
+                studentCode = student?.StudentCode;
+            }
+
             return Ok(new AuthResponse
             {
                 Success = true,
@@ -250,7 +258,8 @@ namespace NeoBoard.Web.Controllers
                     Id = user.Id,
                     Email = user.Email, 
                     FullName = user.FullName,
-                    Role = user.Role
+                    Role = user.Role,
+                    StudentCode = studentCode
                 }
             });
         }
@@ -322,6 +331,32 @@ namespace NeoBoard.Web.Controllers
             };
 
             await _userRepository.AddAsync(user);
+
+            if (role == 3)
+            {
+                var random = new Random();
+                string newStudentCode = "SV" + random.Next(1005, 9999);
+                
+                while (await _context.Students.AnyAsync(s => s.StudentCode == newStudentCode))
+                {
+                    newStudentCode = "SV" + random.Next(1005, 9999);
+                }
+
+                var newStudent = new Student
+                {
+                    Id = user.Id,
+                    StudentCode = newStudentCode,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    Department = "CNTT",
+                    ClassName = "DCT1211",
+                    IsBlocked = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                
+                _context.Students.Add(newStudent);
+                await _context.SaveChangesAsync();
+            }
 
             return Ok(new { Message = "Đăng ký thành công" });
         }
