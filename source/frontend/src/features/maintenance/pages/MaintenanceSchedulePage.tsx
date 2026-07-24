@@ -67,12 +67,12 @@ const MaintenanceSchedulePage = () => {
     }
   };
 
-  const getStatusStyle = (status: string) => {
+  const getStatusClass = (status: string) => {
     switch(status?.toLowerCase()) {
-      case 'scheduled': return 'bg-blue-50 text-blue-600 border-blue-100';
-      case 'overdue': return 'bg-red-50 text-red-600 border-red-100';
-      case 'completed': return 'bg-green-50 text-green-600 border-green-100';
-      default: return 'bg-gray-50 text-gray-600 border-gray-100';
+      case 'scheduled': return 'badge-todo';
+      case 'overdue': return 'badge-high';
+      case 'completed': return 'badge-done';
+      default: return 'badge-todo';
     }
   };
 
@@ -122,15 +122,15 @@ const MaintenanceSchedulePage = () => {
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={4} className="px-6 py-8"></td></tr>)
             ) : currentSchedules.length > 0 ? (
               currentSchedules.map(s => (
-                <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={s.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4 font-bold text-[#1a1a1a]">#AST-{s.assetId}</td>
                   <td className="px-6 py-4 text-gray-600 flex items-center mt-1">
-                    <Calendar size={14} className="mr-2 text-gray-400" />
+                    <Calendar size={14} strokeWidth={1.5} className="mr-2 text-gray-400" />
                     {new Date(s.scheduledDate).toLocaleDateString('vi-VN')}
                   </td>
                   <td className="px-6 py-4 text-gray-500 italic">"{s.description}"</td>
                   <td className="px-6 py-4 text-center">
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${getStatusStyle(s.status)}`}>
+                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent ${getStatusClass(s.status)}`}>
                       {s.status}
                     </span>
                   </td>

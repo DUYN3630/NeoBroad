@@ -67,15 +67,15 @@ const BorrowRequestListPage = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Pending':
-        return <span className="px-2 py-1 bg-orange-50 text-orange-600 text-[11px] font-bold rounded-full flex items-center w-fit"><Clock size={12} className="mr-1" /> Chờ duyệt</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-in-progress flex items-center w-fit"><Clock size={12} strokeWidth={1.5} className="mr-1" /> Chờ duyệt</span>;
       case 'Approved':
-        return <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[11px] font-bold rounded-full flex items-center w-fit"><CheckCircle2 size={12} className="mr-1" /> Đã duyệt</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-todo flex items-center w-fit"><CheckCircle2 size={12} strokeWidth={1.5} className="mr-1" /> Đã duyệt</span>;
       case 'Rejected':
-        return <span className="px-2 py-1 bg-red-50 text-red-600 text-[11px] font-bold rounded-full flex items-center w-fit"><XCircle size={12} className="mr-1" /> Từ chối</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-high flex items-center w-fit"><XCircle size={12} strokeWidth={1.5} className="mr-1" /> Từ chối</span>;
       case 'Returned':
-        return <span className="px-2 py-1 bg-green-50 text-green-600 text-[11px] font-bold rounded-full flex items-center w-fit"><CheckCircle2 size={12} className="mr-1" /> Đã trả</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-done flex items-center w-fit"><CheckCircle2 size={12} strokeWidth={1.5} className="mr-1" /> Đã trả</span>;
       default:
-        return <span className="px-2 py-1 bg-gray-50 text-gray-600 text-[11px] font-bold rounded-full flex items-center w-fit">{status}</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-todo flex items-center w-fit">{status}</span>;
     }
   };
 
@@ -142,10 +142,12 @@ const BorrowRequestListPage = () => {
               [1, 2, 3].map(i => <tr key={i}><td colSpan={5} className="px-6 py-8 text-center text-gray-400 animate-pulse">Đang tải dữ liệu...</td></tr>)
             ) : currentRequests.length > 0 ? (
               currentRequests.map((req) => (
-                <tr key={req.id} className="hover:bg-blue-50/30 transition-colors">
+                <tr key={req.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-start space-x-3">
-                      <div className="p-2 bg-blue-50 text-[#0066cc] rounded-lg"><Handshake size={16} /></div>
+                      <div className="p-2 bg-gray-50 dark:bg-zinc-800 rounded-lg">
+                        <Handshake size={16} strokeWidth={1.5} className="text-gray-400 dark:text-gray-500" />
+                      </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-bold text-[#1a1a1a]">{req.assetName}</p>

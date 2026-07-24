@@ -1,60 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-page: #ffffff;
+  /* SaaS Clean Light Mode (Default Theme - Apple / Linear inspired) */
+  --bg-app: #f4f5f7;
+  --bg-sidebar: #ffffff;
   --bg-card: #ffffff;
+  --bg-table-header: #f8f9fa;
+  --bg-table-row-even: #ffffff;
+  --bg-table-row-odd: #fcfdfe;
+  --bg-input-focus: #ffffff;
   --text-primary: #111827;
   --text-secondary: #6b7280;
-  --border-default: #f3f4f6;
-  --kendo-blue: #0072C6;
-  --kendo-blue-hover: #005a9e;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-grid: #e5e7eb;
+  
+  /* Accent Primary / Highlight: Dark Navy / Almost Black */
+  --accent-color: #0f172a;
+  --accent-hover: #1e293b;
+  --accent-light: rgba(15, 23, 42, 0.05);
+  --text-on-accent: #ffffff;
+  
+  --shadow-main: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-toast: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Status / Indicator Colors */
+  --color-todo: #6b7280;
+  --bg-todo: rgba(107, 114, 128, 0.08);
+  --color-in-progress: #f59e0b;
+  --bg-in-progress: rgba(245, 158, 11, 0.08);
+  --color-testing: #a855f7;
+  --bg-testing: rgba(168, 85, 247, 0.08);
+  --color-done: #10b981;
+  --bg-done: rgba(16, 185, 129, 0.1);
+  
+  --color-high: #ef4444;
+  --bg-high: rgba(239, 68, 68, 0.08);
+  --color-medium: #f59e0b;
+  --bg-medium: rgba(245, 158, 11, 0.08);
+  --color-low: #10b981;
+  --bg-low: rgba(16, 185, 129, 0.1);
+  
+  /* Backward compatibility variables */
+  --bg-page: #f4f5f7;
+  --border-default: #e5e7eb;
+  --kendo-blue: #0f172a;
+  --kendo-blue-hover: #1e293b;
+}
+
+[data-theme="dark"] {
+  /* SaaS Premium Dark Mode (Apple / Linear Dark Style) */
+  --bg-app: #0b0f19;
+  --bg-sidebar: #111827;
+  --bg-card: #1f2937;
+  --bg-table-header: #1f2937;
+  --bg-table-row-even: #111827;
+  --bg-table-row-odd: #0b0f19;
+  --bg-input-focus: #111827;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --border-color: #374151;
+  --border-grid: #374151;
+  
+  --accent-color: #f3f4f6;
+  --accent-hover: #e5e7eb;
+  --accent-light: rgba(243, 244, 246, 0.08);
+  --text-on-accent: #0f172a;
+  
+  --shadow-main: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-toast: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  
+  /* Status / Indicator Colors for Dark Mode */
+  --color-todo: #9ca3af;
+  --bg-todo: rgba(156, 163, 175, 0.15);
+  --color-in-progress: #fbbf24;
+  --bg-in-progress: rgba(251, 191, 36, 0.15);
+  --color-testing: #c084fc;
+  --bg-testing: rgba(192, 132, 252, 0.15);
+  --color-done: #34d399;
+  --bg-done: rgba(52, 211, 153, 0.15);
+  
+  --color-high: #f87171;
+  --bg-high: rgba(248, 113, 113, 0.15);
+  --color-medium: #fbbf24;
+  --bg-medium: rgba(251, 191, 36, 0.15);
+  --color-low: #34d399;
+  --bg-low: rgba(52, 211, 153, 0.15);
+
+  /* Backward compatibility variables */
+  --bg-page: #0b0f19;
+  --border-default: #374151;
+  --kendo-blue: #f3f4f6;
+  --kendo-blue-hover: #e5e7eb;
 }
 
 body {
-  background-color: #ffffff;
+  background-color: var(--bg-app);
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* PHONG CÁCH TRẮNG TINH KHIẾT (CLEAN WHITE) */
+/* Premium Typography for Headers and Values */
+h1, h2, h3, h4, h5, h6, .brand-name, .kpi-value {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif !important;
+}
+
+/* GLOBAL THEME OVERRIDES FOR TAILWIND COMPONENTS */
+
+/* Background overrides */
+.bg-white {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary);
+}
+
+.bg-gray-50, .bg-[#f4f7fa], .bg-[#f8fafc] {
+  background-color: var(--bg-app) !important;
+}
+
+/* Sidebar and Header overrides */
+aside.bg-white, header.bg-white, nav.bg-white {
+  background-color: var(--bg-sidebar) !important;
+  border-color: var(--border-color) !important;
+}
+
+.bg-gray-50\/50, .bg-gray-50\/10 {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+[data-theme="dark"] .bg-gray-50\/50, [data-theme="dark"] .bg-gray-50\/10 {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Border overrides */
+.border-gray-100, .border-gray-200, .border-gray-150 {
+  border-color: var(--border-color) !important;
+}
+
+/* Text color overrides */
+.text-gray-900, .text-[#1a1a1a], .text-gray-800, .text-gray-700 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-600, .text-gray-500 {
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Inputs and Forms */
+input[type="text"], input[type="password"], input[type="email"], select, textarea {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, select:focus, textarea:focus {
+  border-color: var(--accent-color) !important;
+  outline: none;
+}
+
+/* Scrollbar Customization */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 20px;
+}
+
+/* PHONG CÁCH TRẮNG TINH KHIẾT (CLEAN WHITE) -> ADAPTED FOR THEMES */
 .k-bg-gradient {
-  background-color: #ffffff !important;
+  background-color: var(--bg-app) !important;
   background-image: 
-    radial-gradient(circle at 2px 2px, #f3f4f6 1px, transparent 0) !important;
+    radial-gradient(circle at 2px 2px, var(--border-color) 1px, transparent 0) !important;
   background-size: 24px 24px !important;
   position: relative !important;
 }
 
 .k-card-premium {
-  @apply bg-white border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] relative z-10;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-main) !important;
+  position: relative;
+  z-index: 10;
 }
 
 /* KENDO UI STYLE EMULATION */
 @layer components {
   .k-button-primary {
-    @apply bg-[var(--kendo-blue)] hover:bg-[var(--kendo-blue-hover)] text-white font-bold py-2 px-4 rounded shadow-sm transition-all;
+    background-color: var(--accent-color) !important;
+    color: var(--text-on-accent) !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+  }
+  .k-button-primary:hover {
+    background-color: var(--accent-hover) !important;
   }
   
   .k-input {
-    @apply w-full px-3 py-2 bg-white border border-gray-200 rounded text-sm focus:border-[var(--kendo-blue)] focus:ring-4 focus:ring-blue-500/10 outline-none transition-all;
+    width: 100%;
+    padding: 8px 12px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.15s;
+  }
+  .k-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px var(--accent-light);
   }
 
   .k-label {
-    @apply block text-[11px] font-black text-gray-400 mb-1.5 uppercase tracking-wider;
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .k-card {
-    @apply bg-white border border-gray-100 rounded shadow-sm;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-main);
   }
 
   .k-grid-header {
-    @apply bg-[#fafafa] border-b border-gray-100 text-[#374151] font-bold text-xs uppercase;
+    background-color: var(--bg-table-header) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
   }
 }
 
-/* Print Media Styles to format printed/exported PDF reports nicely */
+/* Badges for priority and status */
+.badge-todo { background-color: var(--bg-todo) !important; color: var(--color-todo) !important; }
+.badge-in-progress { background-color: var(--bg-in-progress) !important; color: var(--color-in-progress) !important; }
+.badge-testing { background-color: var(--bg-testing) !important; color: var(--color-testing) !important; }
+.badge-done { background-color: var(--bg-done) !important; color: var(--color-done) !important; }
+
+.badge-high { background-color: var(--bg-high) !important; color: var(--color-high) !important; }
+.badge-medium { background-color: var(--bg-medium) !important; color: var(--color-medium) !important; }
+.badge-low { background-color: var(--bg-low) !important; color: var(--color-low) !important; }
+
+/* Micro-animations and transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 @media print {
   aside, 
   header, 
@@ -81,9 +293,32 @@ body {
     box-shadow: none !important;
   }
 
-  /* Keep chart layouts visible */
   .recharts-responsive-container {
     width: 100% !important;
     height: auto !important;
   }
+}
+
+/* Recharts Dark Theme CSS overrides */
+[data-theme="dark"] .recharts-cartesian-grid-horizontal line,
+[data-theme="dark"] .recharts-cartesian-grid-vertical line {
+  stroke: #374151 !important;
+}
+[data-theme="dark"] .recharts-cartesian-axis-line,
+[data-theme="dark"] .recharts-cartesian-axis-tick-line {
+  stroke: #374151 !important;
+}
+[data-theme="dark"] .recharts-text {
+  fill: #9ca3af !important;
+}
+[data-theme="dark"] .recharts-default-tooltip {
+  background-color: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  color: #f9fafb !important;
+}
+[data-theme="dark"] .recharts-legend-item-text {
+  color: #9ca3af !important;
+}
+[data-theme="dark"] .recharts-tooltip-cursor {
+  fill: rgba(255, 255, 255, 0.05) !important;
 }

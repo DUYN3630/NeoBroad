@@ -17,11 +17,15 @@ import {
   Monitor,
   Search,
   Menu,
-  X
+  X,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { language, setLanguage, t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -173,12 +177,12 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {/* Logo & Main Nav */}
             <div className="flex items-center space-x-10">
               <Link to="/student/portal" className="flex items-center space-x-3 group">
-                <div className="w-10 h-10 bg-[#0066cc] rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 group-hover:scale-105 transition-transform">
-                  <span className="text-white font-black text-xl">N</span>
+                <div className="w-10 h-10 bg-[var(--accent-color)] text-[var(--text-on-accent)] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                  <span className="font-black text-xl">N</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-black text-lg tracking-tighter text-gray-900 leading-none">NeoBoard</span>
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{t("student_portal_title")}</span>
+                  <span className="font-black text-lg tracking-tighter text-[var(--text-primary)] leading-none">NeoBoard</span>
+                  <span className="text-[10px] font-bold text-[var(--accent-color)] uppercase tracking-widest">{t("student_portal_title")}</span>
                 </div>
               </Link>
 
@@ -189,7 +193,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     key={link.path}
                     to={link.path}
                     className={({ isActive }) => `px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center space-x-2 ${
-                      isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                      isActive ? 'bg-[var(--accent-light)] text-[var(--accent-color)]' : 'text-gray-500 hover:bg-[var(--accent-light)] hover:text-[var(--accent-color)]'
                     }`}
                   >
                     {link.icon}
@@ -203,11 +207,11 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <div className="flex items-center space-x-4">
               {/* Search Bar - Modern Style */}
               <div className="hidden lg:flex items-center relative group">
-                <Search size={16} className="absolute left-3 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                <Search size={16} className="absolute left-3 text-gray-400 group-focus-within:text-[var(--accent-color)] transition-colors" />
                 <input 
                   type="text" 
                   placeholder={t("find_assets")} 
-                  className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-2xl text-sm w-48 focus:ring-2 focus:ring-blue-500/20 focus:bg-white focus:w-64 transition-all outline-none"
+                  className="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-2xl text-sm w-48 focus:ring-2 focus:ring-[var(--accent-color)]/20 focus:bg-white focus:w-64 transition-all outline-none"
                 />
               </div>
 
@@ -218,6 +222,15 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 title={language === 'vi' ? 'Chuyển sang tiếng Anh' : 'Switch to Vietnamese'}
               >
                 <span>{language === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN'}</span>
+              </button>
+
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center justify-center p-2.5 bg-gray-50 border border-gray-150 hover:bg-gray-100 hover:border-gray-300 rounded-xl text-gray-400 hover:text-[var(--accent-color)] transition-all shadow-sm w-8 h-8"
+                title={theme === 'light' ? 'Chuyển sang giao diện tối' : 'Chuyển sang giao diện sáng'}
+              >
+                {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
               </button>
 
               {/* Notification Bell */}
@@ -258,7 +271,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                            <div 
                             key={noti.id} 
                             className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50/50 transition-colors flex gap-2 cursor-pointer ${
-                              !noti.read ? 'bg-blue-50/30' : ''
+                              !noti.read ? 'bg-[var(--accent-light)]' : ''
                             }`}
                             onClick={() => {
                               markAsRead(noti.id);
@@ -274,7 +287,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                               <span className="text-[9px] text-gray-300 font-bold mt-1 block">{noti.time}</span>
                             </div>
                             {!noti.read && (
-                              <span className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                              <span className="h-1.5 w-1.5 bg-[var(--accent-color)] rounded-full mt-1.5 flex-shrink-0"></span>
                             )}
                           </div>
                         ))
@@ -292,7 +305,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
                   className="flex items-center space-x-3 p-1 rounded-full hover:bg-gray-50 transition-all"
                 >
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-black shadow-md border-2 border-white">
+                  <div className="w-9 h-9 rounded-full bg-[var(--accent-color)] text-[var(--text-on-accent)] flex items-center justify-center text-xs font-black shadow-md border-2 border-white">
                     {user?.fullName?.charAt(0) || 'S'}
                   </div>
                   <ChevronDown size={14} className={`text-gray-400 transition-transform ${isUserDropdownOpen ? 'rotate-180' : ''}`} />
@@ -311,7 +324,7 @@ const StudentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       {(user?.role === 0 || user?.role === 1) && (
                         <button 
                           onClick={() => navigate('/')}
-                          className="w-full flex items-center px-5 py-3 text-sm font-black text-blue-600 bg-blue-50/50 hover:bg-blue-50 transition-colors"
+                          className="w-full flex items-center px-5 py-3 text-sm font-black text-[var(--accent-color)] bg-[var(--accent-light)] hover:opacity-90 transition-colors"
                         >
                           <ShieldAlert size={18} className="mr-3" /> {t("back_to_admin")}
                         </button>

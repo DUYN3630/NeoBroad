@@ -87,13 +87,13 @@ const FailureTicketPage = () => {
   const getStatusBadge = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'pending':
-        return <span className="px-2 py-1 bg-yellow-50 text-yellow-600 text-[10px] font-bold rounded-full flex items-center w-fit"><Clock size={12} className="mr-1" /> Chờ duyệt</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-in-progress flex items-center w-fit"><Clock size={12} strokeWidth={1.5} className="mr-1" /> Chờ duyệt</span>;
       case 'in progress':
-        return <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full flex items-center w-fit"><Clock size={12} className="mr-1" /> Đang xử lý</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-todo flex items-center w-fit"><Clock size={12} strokeWidth={1.5} className="mr-1" /> Đang xử lý</span>;
       case 'resolved':
-        return <span className="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-full flex items-center w-fit"><CheckCircle2 size={12} className="mr-1" /> Đã xử lý</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-done flex items-center w-fit"><CheckCircle2 size={12} strokeWidth={1.5} className="mr-1" /> Đã xử lý</span>;
       default:
-        return <span className="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] font-bold rounded-full flex items-center w-fit">{status}</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-todo flex items-center w-fit">{status}</span>;
     }
   };
 
@@ -152,12 +152,12 @@ const FailureTicketPage = () => {
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={isAdmin ? 5 : 4} className="px-6 py-8"></td></tr>)
             ) : currentFailures.length > 0 ? (
               currentFailures.map((f) => (
-                <tr key={f.id} className="hover:bg-red-50/20 transition-colors">
+                <tr key={f.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4 font-mono font-bold text-gray-400">#FL-{f.id}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
-                        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                            <User size={14} />
+                        <div className="w-7 h-7 rounded-full bg-gray-50 dark:bg-zinc-800 flex items-center justify-center">
+                            <User size={14} strokeWidth={1.5} className="text-gray-400 dark:text-gray-500" />
                         </div>
                         <span className="font-medium text-[#1a1a1a]">{f.reportedBy}</span>
                     </div>

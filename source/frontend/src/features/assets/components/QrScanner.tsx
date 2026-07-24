@@ -23,7 +23,15 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onClose, title }) => {
           videoRef.current.srcObject = stream;
         }
       } catch (err) {
-        setError("Không thể truy cập camera. Vui lòng cấp quyền.");
+        try {
+          // Thử lại với camera bất kỳ nếu không tìm thấy camera sau (environment)
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (fallbackErr) {
+          setError("Không thể truy cập camera. Vui lòng kiểm tra quyền thiết bị.");
+        }
       }
     };
 
@@ -62,7 +70,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onClose, title }) => {
             </div>
           ) : (
             <>
-              <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover opacity-60" />
+              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover opacity-60" />
               
               {/* Scanner Overlay UI */}
               <div className="absolute inset-0 border-[40px] border-black/40 flex items-center justify-center">

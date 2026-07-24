@@ -24,32 +24,32 @@ const DashboardPage = () => {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1a1a1a]">Hệ thống Quản lý tài sản (AMS)</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Hệ thống Quản lý tài sản (AMS)</h1>
         <p className="text-gray-500 text-sm">Trình điều khiển trung tâm dành cho quản trị viên.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-[var(--bg-card)] p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Tổng tài sản</h3>
-            <p className="text-3xl font-black text-[#1a1a1a]">{loading ? '...' : stats?.totalAssets}</p>
+            <p className="text-3xl font-black text-[var(--text-primary)]">{loading ? '...' : stats?.totalAssets}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-[var(--bg-card)] p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Đang bảo trì</h3>
             <p className="text-3xl font-black text-orange-500">{loading ? '...' : stats?.pendingFailures}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-[var(--bg-card)] p-6 rounded-xl shadow-sm border border-[var(--border-color)]">
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Tỷ lệ hoạt động</h3>
             <p className="text-3xl font-black text-green-500">98%</p>
         </div>
       </div>
       
-      <div className="mt-8 bg-blue-50 border border-blue-100 p-6 rounded-2xl flex items-start space-x-4">
-          <div className="p-2 bg-blue-600 text-white rounded-lg">
-              <AlertCircle size={24} />
+      <div className="mt-8 bg-[var(--bg-card)] border border-[var(--border-color)] p-6 rounded-2xl flex items-start space-x-4">
+          <div className="p-2 bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 rounded-lg flex items-center justify-center">
+              <AlertCircle size={24} strokeWidth={1.5} />
           </div>
           <div>
-              <h4 className="font-bold text-blue-900">Mẹo quản trị nhanh</h4>
-              <p className="text-blue-700 text-sm mt-1 leading-relaxed">
+              <h4 className="font-bold text-[var(--text-primary)]">Mẹo quản trị nhanh</h4>
+              <p className="text-gray-500 text-sm mt-1 leading-relaxed">
                   Bạn có thể nhấn vào Avatar góc phải để chuyển sang "Giao diện Sinh viên" nhằm kiểm tra trải nghiệm người dùng cuối mà không cần đăng xuất.
               </p>
           </div>

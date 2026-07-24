@@ -192,9 +192,9 @@ const MyTasksPage = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Done': return 'bg-green-50 text-green-600 border-green-100';
-      case 'In Progress': return 'bg-blue-50 text-blue-600 border-blue-100';
-      default: return 'bg-gray-50 text-gray-500 border-gray-200';
+      case 'Done': return 'badge-done';
+      case 'In Progress': return 'badge-in-progress';
+      default: return 'badge-todo';
     }
   };
 
@@ -202,22 +202,22 @@ const MyTasksPage = () => {
     <>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#1a1a1a]">Lịch trình công việc của tôi</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Lịch trình công việc của tôi</h1>
           <p className="text-gray-500 text-sm mt-1">Chào {user?.fullName || 'Kỹ thuật viên'}, đây là danh sách nhiệm vụ bảo trì bạn cần thực hiện.</p>
         </div>
-        <div className="bg-white p-2 rounded-lg border border-gray-200 shadow-sm flex items-center space-x-4">
+        <div className="bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)] shadow-sm flex items-center space-x-4">
             <div className="text-right">
-                <p className="text-[10px] font-black text-gray-400 uppercase">Hôm nay</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase">Hôm nay</p>
                 <p className="text-xs font-bold text-gray-700">{new Date().toLocaleDateString('vi-VN')}</p>
             </div>
-            <Calendar size={20} className="text-[#0072C6]" />
+            <Calendar size={20} strokeWidth={1.5} className="text-[#0072C6]" />
         </div>
       </div>
 
       {/* LỊCH LÀM VIỆC TUẦN NÀY (WEEKLY WORK CALENDAR) */}
-      <div className="mb-6 bg-white p-5 rounded-2xl border border-gray-150 shadow-sm">
+      <div className="mb-6 bg-[var(--bg-card)] p-5 rounded-2xl border border-[var(--border-color)] shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xs font-black text-gray-450 uppercase tracking-widest">Lịch làm việc tuần này</h2>
+          <h2 className="text-xs font-bold text-gray-450 uppercase tracking-widest">Lịch làm việc tuần này</h2>
           {selectedDateFilter && (
             <button 
               onClick={() => setSelectedDateFilter(null)}
@@ -243,20 +243,20 @@ const MyTasksPage = () => {
                   isSelected
                     ? 'bg-blue-600 border-blue-600 text-white shadow-md'
                     : isToday
-                    ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100/50'
-                    : 'bg-gray-50 border-gray-100 text-gray-500 hover:bg-gray-100 hover:border-gray-205'
+                    ? 'bg-blue-50/50 dark:bg-zinc-800/40 border-blue-200 dark:border-zinc-700 text-blue-600 dark:text-zinc-300 hover:bg-blue-100/30'
+                    : 'bg-gray-50 dark:bg-zinc-800/20 border-gray-100 dark:border-zinc-800 text-gray-500 hover:bg-gray-100 hover:border-gray-200'
                 }`}
               >
-                <span className="text-[9px] font-black uppercase tracking-wider mb-1">
+                <span className="text-[9px] font-bold uppercase tracking-wider mb-1">
                   {getDayLabel(day)}
                 </span>
-                <span className="text-base font-black tracking-tight">
+                <span className="text-base font-bold tracking-tight">
                   {day.getDate()}
                 </span>
                 
                 {taskCount > 0 && (
-                  <span className={`absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full text-[9px] font-black flex items-center justify-center border shadow-sm ${
-                    isSelected ? 'bg-white text-blue-600 border-blue-600' : 'bg-red-500 text-white border-white'
+                  <span className={`absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full text-[9px] font-bold flex items-center justify-center border shadow-sm ${
+                    isSelected ? 'bg-white text-blue-600 border-blue-600' : 'bg-red-550 text-white border-white'
                   }`}>
                     {taskCount}
                   </span>
@@ -277,32 +277,32 @@ const MyTasksPage = () => {
                     <div 
                       key={task.id} 
                       onClick={() => handleOpenDetailsModal(task)}
-                      className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all flex items-start justify-between group cursor-pointer"
+                      className="bg-[var(--bg-card)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm hover:shadow-md hover:border-blue-200 transition-all flex items-start justify-between group cursor-pointer"
                     >
                         <div className="flex items-start space-x-4">
-                            <div className={`p-3 rounded-xl ${task.priority === 'High' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-[#0072C6]'}`}>
-                                <Wrench size={20} />
+                            <div className="p-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 flex items-center justify-center">
+                                <Wrench size={20} strokeWidth={1.5} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-gray-700 group-hover:text-[#0072C6] transition-colors">{task.title}</h3>
+                                <h3 className="font-bold text-gray-700 dark:text-gray-200 group-hover:text-[#0072C6] transition-colors">{task.title}</h3>
                                 <p className="text-xs text-gray-400 mt-1 mb-3">{task.description}</p>
                                 <div className="flex items-center space-x-4">
                                     <span className="flex items-center text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
-                                        <Calendar size={12} className="mr-1" /> Hạn: {new Date(task.dueDate).toLocaleDateString('vi-VN')}
+                                        <Calendar size={12} strokeWidth={1.5} className="mr-1" /> Hạn: {new Date(task.dueDate).toLocaleDateString('vi-VN')}
                                     </span>
-                                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${getStatusColor(task.status)}`}>
+                                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent uppercase ${getStatusColor(task.status)}`}>
                                         {task.status}
                                     </span>
                                 </div>
                             </div>
                         </div>
                         <button className="p-2 text-gray-300 group-hover:text-[#0072C6] group-hover:bg-blue-50 rounded-full transition-all">
-                            <ChevronRight size={20} />
+                            <ChevronRight size={20} strokeWidth={1.5} />
                         </button>
                     </div>
                 ))
             ) : (
-                <div className="p-12 bg-white rounded-2xl border-2 border-dashed border-gray-100 text-center">
+                <div className="p-12 bg-[var(--bg-card)] rounded-2xl border-2 border-dashed border-[var(--border-color)] text-center">
                     <p className="text-gray-400 italic">Bạn chưa được giao công việc nào trong hôm nay.</p>
                 </div>
             )}
@@ -463,22 +463,22 @@ const MyTasksPage = () => {
             {/* Content */}
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase border ${
-                  selectedTask.priority === 'High' ? 'bg-red-50 text-red-500 border-red-150' : 'bg-blue-50 text-[#0072C6] border-blue-150'
+                <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent uppercase ${
+                  selectedTask.priority === 'High' ? 'badge-high' : 'badge-todo'
                 }`}>
                   Ưu tiên: {selectedTask.priority}
                 </span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${getStatusColor(selectedTask.status)}`}>
+                <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent uppercase ${getStatusColor(selectedTask.status)}`}>
                   {selectedTask.status}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-base font-black text-gray-800">{selectedTask.title}</h3>
+                <h3 className="text-base font-bold text-gray-800">{selectedTask.title}</h3>
                 <p className="text-xs text-gray-450 mt-1">Hạn thực hiện: {new Date(selectedTask.dueDate).toLocaleDateString('vi-VN')}</p>
               </div>
 
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="p-4 bg-gray-50 dark:bg-zinc-800/20 rounded-xl border border-gray-100 dark:border-zinc-800/50">
                 <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Mô tả công việc:</p>
                 <p className="text-xs text-gray-650 leading-relaxed italic">"{selectedTask.description}"</p>
               </div>
@@ -501,7 +501,7 @@ const MyTasksPage = () => {
                     🛠️ Báo cáo & Nghiệm thu
                   </button>
                 ) : (
-                  <div className="p-3 bg-green-50 text-green-700 rounded-xl text-center text-xs font-bold">
+                  <div className="p-3 bg-gray-50 dark:bg-zinc-800/40 text-gray-550 dark:text-gray-300 rounded-xl text-center text-xs font-bold border border-gray-100 dark:border-zinc-700/50">
                     ✅ Công việc đã hoàn thành
                   </div>
                 )}

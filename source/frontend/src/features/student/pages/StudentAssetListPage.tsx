@@ -255,11 +255,11 @@ const StudentAssetListPage = () => {
 
   const getIcon = (type: string) => {
     switch (type?.toLowerCase()) {
-      case 'laptop': return <Laptop size={20} className="text-blue-500" />;
-      case 'monitor': return <Monitor size={20} className="text-purple-500" />;
-      case 'printer': return <Printer size={20} className="text-orange-500" />;
-      case 'network': return <Network size={20} className="text-green-500" />;
-      default: return <Database size={20} className="text-gray-500" />;
+      case 'laptop': return <Laptop size={18} strokeWidth={1.5} />;
+      case 'monitor': return <Monitor size={18} strokeWidth={1.5} />;
+      case 'printer': return <Printer size={18} strokeWidth={1.5} />;
+      case 'network': return <Network size={18} strokeWidth={1.5} />;
+      default: return <Database size={18} strokeWidth={1.5} />;
     }
   };
 
@@ -429,10 +429,10 @@ const StudentAssetListPage = () => {
                       <div key={asset.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <div className="p-3 bg-blue-50/80 rounded-2xl text-[#0066cc] group-hover:scale-110 transition-transform duration-300">
+                            <div className="p-3 bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 rounded-2xl group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
                               {getIcon(asset.type)}
                             </div>
-                            <span className="px-2.5 py-1 bg-green-50 text-green-600 text-[10px] font-black rounded-full uppercase tracking-wider border border-green-100">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border border-transparent badge-done">
                               Sẵn sàng
                             </span>
                           </div>
@@ -504,10 +504,10 @@ const StudentAssetListPage = () => {
                       <div key={toolset.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <div className="p-3 bg-amber-50/80 rounded-2xl text-amber-600 group-hover:scale-110 transition-transform duration-300">
-                              <Wrench size={18} />
+                            <div className="p-3 bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 rounded-2xl group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
+                              <Wrench size={18} strokeWidth={1.5} />
                             </div>
-                            <span className="px-2.5 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-wider border border-amber-100">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border border-transparent badge-in-progress">
                               Còn {toolset.availableQuantity} bộ
                             </span>
                           </div>
@@ -662,8 +662,8 @@ const StudentAssetListPage = () => {
                         <div className="flex flex-col truncate max-w-[280px]">
                           <span className="font-bold text-gray-800 truncate text-xs">{item.name}</span>
                           <span className="text-[9px] text-gray-400 flex items-center gap-1.5 mt-0.5">
-                            <span className={`px-1.5 py-0.5 rounded font-black uppercase ${
-                              item.cartItemType === 'asset' ? 'bg-blue-50 text-[#0066cc]' : 'bg-amber-50 text-amber-600'
+                            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase border border-transparent ${
+                              item.cartItemType === 'asset' ? 'badge-todo' : 'badge-in-progress'
                             }`}>
                               {item.cartItemType === 'asset' ? 'Thiết bị' : 'Bộ dụng cụ'}
                             </span>
@@ -804,8 +804,8 @@ const StudentAssetListPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden border border-gray-200 animate-in zoom-in-95 duration-200">
             <div className="p-6 text-center space-y-6">
-              <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto border border-green-100">
-                <Check size={32} />
+              <div className="w-16 h-16 bg-gray-50 dark:bg-zinc-800 text-green-600 dark:text-green-500 rounded-full flex items-center justify-center mx-auto border border-gray-100 dark:border-zinc-700/50">
+                <Check size={32} strokeWidth={1.5} />
               </div>
               <div>
                 <h3 className="text-xl font-black text-gray-950 uppercase">Đăng ký mượn thành công!</h3>
@@ -815,7 +815,7 @@ const StudentAssetListPage = () => {
               <div className="bg-gray-50 p-5 rounded-2xl text-left border border-gray-100 space-y-4 font-mono text-xs">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">Mã Hash giao dịch (Blockchain-lite)</span>
-                  <div className="p-2.5 bg-blue-50/50 text-[#0066cc] rounded-xl font-bold border border-blue-100 break-all select-all">
+                  <div className="p-2.5 bg-gray-50 dark:bg-zinc-800/40 text-blue-600 dark:text-blue-400 rounded-xl font-bold border border-gray-150 dark:border-zinc-800 break-all select-all">
                     {successData.transactionHash}
                   </div>
                 </div>

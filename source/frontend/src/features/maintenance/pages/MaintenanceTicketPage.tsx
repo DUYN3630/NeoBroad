@@ -132,8 +132,8 @@ const MaintenanceTicketPage = () => {
                   <td className="px-6 py-4 text-gray-500 text-xs italic">"{t.description}"</td>
                   <td className="px-6 py-4 font-bold text-orange-600 font-mono">{formatCurrency(t.totalCost)}</td>
                   <td className="px-6 py-4 text-center">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                        t.verificationResult === 'Passed' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100'
+                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent ${
+                        t.verificationResult === 'Passed' ? 'badge-done' : 'badge-high'
                     }`}>
                         {t.verificationResult}
                     </span>

@@ -79,12 +79,13 @@ const AssetListPage = () => {
   };
 
   const getIcon = (type: string) => {
+    const iconClass = "text-gray-400 dark:text-gray-500";
     switch (type?.toLowerCase()) {
-      case 'laptop': return <Laptop size={16} className="text-blue-500" />;
-      case 'monitor': return <Monitor size={16} className="text-purple-500" />;
-      case 'printer': return <Printer size={16} className="text-orange-500" />;
-      case 'network': return <Network size={16} className="text-green-500" />;
-      default: return <Database size={16} className="text-gray-500" />;
+      case 'laptop': return <Laptop size={16} strokeWidth={1.5} className={iconClass} />;
+      case 'monitor': return <Monitor size={16} strokeWidth={1.5} className={iconClass} />;
+      case 'printer': return <Printer size={16} strokeWidth={1.5} className={iconClass} />;
+      case 'network': return <Network size={16} strokeWidth={1.5} className={iconClass} />;
+      default: return <Database size={16} strokeWidth={1.5} className={iconClass} />;
     }
   };
 
@@ -106,16 +107,16 @@ const AssetListPage = () => {
     let badge;
     switch (status?.toLowerCase()) {
       case 'active':
-        badge = <span className="px-2 py-1 bg-green-50 text-green-600 text-[11px] font-bold rounded-full flex items-center w-fit"><CheckCircle2 size={12} className="mr-1" /> Hoạt động</span>;
+        badge = <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-done flex items-center w-fit"><CheckCircle2 size={12} strokeWidth={1.5} className="mr-1" /> Hoạt động</span>;
         break;
       case 'maintenance':
-        badge = <span className="px-2 py-1 bg-orange-50 text-orange-600 text-[11px] font-bold rounded-full flex items-center w-fit"><Clock size={12} className="mr-1" /> Bảo trì</span>;
+        badge = <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-in-progress flex items-center w-fit"><Clock size={12} strokeWidth={1.5} className="mr-1" /> Bảo trì</span>;
         break;
       case 'broken':
-        badge = <span className="px-2 py-1 bg-red-50 text-red-600 text-[11px] font-bold rounded-full flex items-center w-fit"><AlertCircle size={12} className="mr-1" /> Hỏng</span>;
+        badge = <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-high flex items-center w-fit"><AlertCircle size={12} strokeWidth={1.5} className="mr-1" /> Hỏng</span>;
         break;
       default:
-        badge = <span className="px-2 py-1 bg-gray-50 text-gray-600 text-[11px] font-bold rounded-full flex items-center w-fit">{status}</span>;
+        badge = <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-todo flex items-center w-fit">{status}</span>;
         break;
     }
 
@@ -123,8 +124,8 @@ const AssetListPage = () => {
       return (
         <div className="flex flex-col gap-1">
           {badge}
-          <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 text-[9px] font-black rounded-md flex items-center w-fit animate-pulse">
-            <Clock size={10} className="mr-1" /> Trễ bảo trì
+          <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-testing flex items-center w-fit animate-pulse">
+            <Clock size={10} strokeWidth={1.5} className="mr-1" /> Trễ bảo trì
           </span>
         </div>
       );
@@ -249,10 +250,10 @@ const AssetListPage = () => {
               [1, 2].map(i => <tr key={i} className="animate-pulse"><td colSpan={isAdmin ? 7 : 6} className="px-6 py-8"></td></tr>)
             ) : currentAssets.length > 0 ? (
               currentAssets.map((asset) => (
-                <tr key={asset.id} className="hover:bg-blue-50/30 transition-colors group">
+                <tr key={asset.id} className="hover:bg-gray-50/50 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
+                      <div className="p-2 bg-gray-50 dark:bg-zinc-800 rounded-lg">
                         {getIcon(asset.type)}
                       </div>
                       <div>

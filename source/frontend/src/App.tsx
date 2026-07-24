@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './app/Router';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import './index.css';
 
 const rawClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -13,9 +14,11 @@ const GOOGLE_CLIENT_ID = (rawClientId && rawClientId.trim() !== '' && rawClientI
 function App() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <LanguageProvider>
-        <RouterProvider router={router} />
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <RouterProvider router={router} />
+        </LanguageProvider>
+      </ThemeProvider>
     </GoogleOAuthProvider>
   );
 }

@@ -142,24 +142,24 @@ const RepairTicketPage = () => {
               <tr><td colSpan={6} className="px-6 py-10 text-center text-gray-400">Đang tải dữ liệu...</td></tr>
             ) : currentRepairs.length > 0 ? (
               currentRepairs.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50 transition-colors group">
+                <tr key={r.id} className="hover:bg-gray-50/50 transition-colors group">
                   <td className="px-6 py-4 font-mono font-bold text-[#0066cc]">#RP-{r.id}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
-                        <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 font-bold">
+                        <div className="w-7 h-7 rounded-full bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-gray-400 dark:text-gray-500 font-bold">
                             {r.technicianName ? r.technicianName.charAt(0) : 'U'}
                         </div>
-                        <span className="font-bold text-gray-700">{r.technicianName || 'N/A'}</span>
+                        <span className="font-bold text-gray-700 dark:text-gray-300">{r.technicianName || 'N/A'}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 font-bold text-orange-600">{formatCurrency(r.estimatedCost)}</td>
                   <td className="px-6 py-4 text-gray-500 flex items-center">
-                    <Calendar size={14} className="mr-2" />
+                    <Calendar size={14} strokeWidth={1.5} className="mr-2 text-gray-450" />
                     {new Date(r.startDate).toLocaleDateString('vi-VN')}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full flex items-center w-fit">
-                        <Clock size={12} className="mr-1" /> {r.status}
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-md border border-transparent badge-in-progress flex items-center w-fit">
+                        <Clock size={12} strokeWidth={1.5} className="mr-1" /> {r.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">

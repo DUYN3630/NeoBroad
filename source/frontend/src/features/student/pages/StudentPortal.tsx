@@ -435,35 +435,35 @@ const StudentPortal = () => {
 
         {/* STATS TILES (Dashboard Mini Cards) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm flex items-center justify-between hover:shadow-md transition-all">
+          <div className="bg-[var(--bg-card)] p-5 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center justify-between hover:shadow-md transition-all">
             <div>
-              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Thiết bị đang mượn</p>
-              <p className="text-xl font-black text-gray-800 mt-1">{approvedCount} Thiết bị</p>
+              <p className="text-[10px] text-gray-450 font-bold uppercase tracking-widest">Thiết bị đang mượn</p>
+              <p className="text-xl font-bold text-[var(--text-primary)] mt-1">{approvedCount} Thiết bị</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Package size={18} />
+            <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 flex items-center justify-center">
+              <Package size={18} strokeWidth={1.5} />
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm flex items-center justify-between hover:shadow-md transition-all">
+          <div className="bg-[var(--bg-card)] p-5 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center justify-between hover:shadow-md transition-all">
             <div>
-              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Đơn chờ duyệt</p>
-              <p className="text-xl font-black text-gray-800 mt-1">{pendingCount} Đơn</p>
+              <p className="text-[10px] text-gray-450 font-bold uppercase tracking-widest">Đơn chờ duyệt</p>
+              <p className="text-xl font-bold text-[var(--text-primary)] mt-1">{pendingCount} Đơn</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <ClipboardList size={18} />
+            <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 flex items-center justify-center">
+              <ClipboardList size={18} strokeWidth={1.5} />
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm flex items-center justify-between hover:shadow-md transition-all">
+          <div className="bg-[var(--bg-card)] p-5 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center justify-between hover:shadow-md transition-all">
             <div>
-              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Cảnh báo trễ hạn</p>
-              <p className={`text-xl font-black mt-1 ${overdueItems.length > 0 ? 'text-red-600' : 'text-gray-800'}`}>
+              <p className="text-[10px] text-gray-450 font-bold uppercase tracking-widest">Cảnh báo trễ hạn</p>
+              <p className={`text-xl font-bold mt-1 ${overdueItems.length > 0 ? 'text-red-650 dark:text-red-500' : 'text-[var(--text-primary)]'}`}>
                 {overdueItems.length} Thiết bị
               </p>
             </div>
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${overdueItems.length > 0 ? 'bg-red-50 text-red-500 animate-pulse' : 'bg-gray-50 text-gray-400'}`}>
-              <AlertTriangle size={18} />
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${overdueItems.length > 0 ? 'bg-red-50 dark:bg-red-950/20 text-red-500 animate-pulse' : 'bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-500'}`}>
+              <AlertTriangle size={18} strokeWidth={1.5} />
             </div>
           </div>
         </div>
@@ -560,7 +560,7 @@ const StudentPortal = () => {
                  <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight flex items-center space-x-2">
                       <span>Thiết bị đang giữ</span>
-                      <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-[10px] font-black tracking-widest border border-blue-100">
+                      <span className="bg-gray-50 dark:bg-zinc-800 text-gray-500 px-2 py-0.5 rounded-md text-[10px] font-bold border border-transparent">
                         {approvedCount} Món
                       </span>
                     </h3>
@@ -631,9 +631,9 @@ const StudentPortal = () => {
                               onClick={() => navigate('/student/assets', { state: { tab: cat.tab, category: cat.type } })}
                               className="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm hover:shadow-md hover:border-blue-100 transition-all cursor-pointer group"
                           >
-                              <div className={`w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform`}>
-                                  {cat.icon}
-                                  </div>
+                              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                                  {React.cloneElement(cat.icon, { size: 18, strokeWidth: 1.5 })}
+                              </div>
                               <p className="font-bold text-gray-800 text-xs leading-tight">{cat.name}</p>
                               <p className="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-widest">{cat.count} Sẵn sàng</p>
                           </div>
@@ -824,48 +824,48 @@ const StudentPortal = () => {
                         </td>
                         <td className="px-4 py-4">
                           {item.actualReturnDate ? (
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent ${
                               item.conditionOnReturn?.includes('Báo mất')
-                                ? 'bg-red-50 text-red-600 border border-red-100'
+                                ? 'badge-high'
                                 : item.conditionOnReturn?.includes('Hỏng') || item.conditionOnReturn?.includes('Lỗi')
-                                ? 'bg-amber-50 text-amber-600 border border-amber-100'
-                                : 'bg-green-50 text-green-600 border border-green-100'
+                                ? 'badge-in-progress'
+                                : 'badge-done'
                             }`}>
                               {item.conditionOnReturn}
                             </span>
                           ) : (
-                            <span className="text-gray-300 italic text-[10px]">Chưa trả</span>
+                            <span className="text-gray-300 dark:text-gray-600 italic text-[10px]">Chưa trả</span>
                           )}
                         </td>
                         <td className="px-4 py-4">
                           {item.actualReturnDate ? (
                             item.conditionOnReturn?.includes('Báo mất') ? (
-                              <span className="px-2.5 py-0.5 bg-red-100 text-red-700 rounded-full text-[9px] font-black uppercase tracking-wider border border-red-200">
+                              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent badge-high uppercase tracking-wider">
                                 Đã mất - Chờ đền bù
                               </span>
                             ) : item.conditionOnReturn?.includes('Hỏng') || item.conditionOnReturn?.includes('Lỗi') ? (
-                              <span className="px-2.5 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[9px] font-black uppercase tracking-wider border border-amber-250">
+                              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent badge-in-progress uppercase tracking-wider">
                                 Hỏng - Đang sửa chữa
                               </span>
                             ) : (
-                              <span className="px-2.5 py-0.5 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-green-100">
+                              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent badge-done uppercase tracking-wider">
                                 Đã hoàn trả
                               </span>
                             )
                           ) : item.requestStatus === 'Pending' ? (
-                            <span className="px-2.5 py-0.5 bg-orange-50 text-orange-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-orange-100 animate-pulse">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent badge-in-progress uppercase tracking-wider animate-pulse">
                               Chờ duyệt mượn
                             </span>
                           ) : item.requestStatus === 'Rejected' ? (
-                            <span className="px-2.5 py-0.5 bg-red-50 text-red-500 rounded-full text-[9px] font-black uppercase tracking-wider border border-red-100">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent badge-high uppercase tracking-wider">
                               Đã từ chối
                             </span>
                           ) : isOverdue ? (
-                            <span className="px-2.5 py-0.5 bg-red-50 text-red-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-red-200 animate-pulse">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent badge-high uppercase tracking-wider animate-pulse">
                               Quá hạn trả
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-blue-100">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-transparent badge-todo uppercase tracking-wider">
                               Đang sử dụng
                             </span>
                           )}
@@ -920,23 +920,23 @@ const StudentPortal = () => {
                 return (
                   <div key={post.id} className="bg-white rounded-3xl border border-gray-150 shadow-sm overflow-hidden flex flex-col">
                     {/* Header */}
-                    <div className="p-5 flex items-center space-x-3.5 border-b border-gray-50">
-                      <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-black border border-blue-100 uppercase text-xs">
+                    <div className="p-5 flex items-center space-x-3.5 border-b border-gray-50 dark:border-zinc-800/50">
+                      <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-zinc-800 text-gray-550 dark:text-gray-400 flex items-center justify-center font-bold border border-transparent uppercase text-xs">
                         {post.authorName ? post.authorName.charAt(0) : 'U'}
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h4 className="font-black text-xs text-gray-900">{post.authorName}</h4>
-                          <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${
-                            post.authorRole === 0 ? 'bg-red-55 text-red-700 border border-red-100' :
-                            post.authorRole === 1 ? 'bg-amber-55 text-amber-700 border border-amber-100' :
-                            post.authorRole === 2 ? 'bg-purple-55 text-purple-700 border border-purple-100' :
-                            'bg-blue-55 text-blue-700 border border-blue-100'
+                          <h4 className="font-bold text-xs text-gray-900 dark:text-gray-100">{post.authorName}</h4>
+                          <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border border-transparent ${
+                            post.authorRole === 0 ? 'badge-high' :
+                            post.authorRole === 1 ? 'badge-in-progress' :
+                            post.authorRole === 2 ? 'badge-testing' :
+                            'badge-todo'
                           }`}>
                             {post.authorRole === 0 ? 'Admin' : post.authorRole === 1 ? 'Staff' : post.authorRole === 2 ? 'Teacher' : 'Student'}
                           </span>
                         </div>
-                        <span className="text-[9px] text-gray-400 font-bold block mt-0.5">
+                        <span className="text-[9px] text-gray-450 font-bold block mt-0.5">
                           {new Date(post.createdAt).toLocaleDateString('vi-VN')} {new Date(post.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
@@ -984,11 +984,11 @@ const StudentPortal = () => {
                                 <div className="space-y-1 min-w-0">
                                   <div className="flex items-center space-x-1.5 flex-wrap">
                                     <span className="font-bold text-[10px] text-gray-900">{comment.authorName}</span>
-                                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
-                                      comment.authorRole === 0 ? 'bg-red-50 text-red-650 border border-red-100' :
-                                      comment.authorRole === 1 ? 'bg-amber-50 text-amber-650 border border-amber-100' :
-                                      comment.authorRole === 2 ? 'bg-purple-50 text-purple-650 border border-purple-100' :
-                                      'bg-blue-50 text-blue-650 border border-blue-100'
+                                    <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold border border-transparent uppercase ${
+                                      comment.authorRole === 0 ? 'badge-high' :
+                                      comment.authorRole === 1 ? 'badge-in-progress' :
+                                      comment.authorRole === 2 ? 'badge-testing' :
+                                      'badge-todo'
                                     }`}>
                                       {comment.authorRole === 0 ? 'Admin' : comment.authorRole === 1 ? 'Staff' : comment.authorRole === 2 ? 'Teacher' : 'Student'}
                                     </span>
@@ -1065,10 +1065,10 @@ const StudentPortal = () => {
                 <div key={survey.id} className="bg-white rounded-3xl border border-gray-150 shadow-sm p-6 space-y-4 hover:shadow-md transition-all flex flex-col justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border ${
+                      <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border border-transparent ${
                         survey.hasSubmitted 
-                          ? 'bg-emerald-50 text-emerald-600 border-emerald-150' 
-                          : 'bg-blue-50 text-blue-600 border-blue-150'
+                          ? 'badge-done' 
+                          : 'badge-todo'
                       }`}>
                         {survey.hasSubmitted ? 'Đã hoàn thành' : 'Chưa tham gia'}
                       </span>

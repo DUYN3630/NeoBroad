@@ -25,8 +25,11 @@ import {
   Layers,
   Eye,
   UserCircle,
-  Settings
+  Settings,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -51,8 +54,8 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
             to={path}
             className={({ isActive }) => `flex items-center justify-center w-11 h-11 transition-all duration-200 rounded-xl ${
               isActive 
-                ? 'bg-[#0066cc] text-white shadow-md shadow-blue-200' 
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-[var(--accent-color)] text-[var(--text-on-accent)] shadow-md shadow-gray-200/50 dark:shadow-none' 
+                : 'text-gray-500 hover:bg-[var(--accent-light)] hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <span>{icon}</span>
@@ -65,8 +68,8 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
             }}
             className={`flex items-center justify-center w-11 h-11 cursor-pointer transition-all duration-200 rounded-xl ${
               isActive
-                ? 'bg-blue-50 text-[#0066cc]' 
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-[var(--accent-light)] text-[var(--text-primary)] font-bold' 
+                : 'text-gray-500 hover:bg-[var(--accent-light)] hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <span>{icon}</span>
@@ -83,8 +86,8 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
         {/* Floating Submenu for items with sub-items */}
         {subItems && (
           <div className="absolute left-full top-0 pl-3 hidden group-hover:block z-50">
-            <div className="bg-white border border-gray-200 rounded-xl shadow-xl py-2 min-w-[180px] text-left">
-              <div className="px-4 py-1.5 text-[10px] font-black text-gray-400 uppercase border-b border-gray-100 mb-1">
+            <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl shadow-xl py-2 min-w-[180px] text-left">
+              <div className="px-4 py-1.5 text-[10px] font-black text-gray-400 uppercase border-b border-[var(--border-color)] mb-1">
                 {text}
               </div>
               <div className="space-y-0.5">
@@ -94,8 +97,8 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
                     to={sub.path}
                     className={`block px-4 py-2 text-xs transition-all ${
                       location.pathname === sub.path
-                        ? 'bg-blue-50 text-[#0066cc] font-black'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-[var(--accent-light)] text-[var(--text-primary)] font-bold'
+                        : 'text-gray-600 hover:bg-[var(--accent-light)] hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
                     }`}
                   >
                     {sub.text}
@@ -116,12 +119,12 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
           to={path}
           className={({ isActive }) => `flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-200 rounded-xl mx-2 ${
             isActive 
-              ? 'bg-[#0066cc] text-white shadow-lg shadow-blue-100' 
-              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              ? 'bg-[var(--accent-color)] text-[var(--text-on-accent)] shadow-lg shadow-gray-250/20 dark:shadow-none' 
+              : 'text-gray-600 hover:bg-[var(--accent-light)] hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
           }`}
         >
           <div className="flex items-center space-x-3">
-            <span className={isActive ? 'text-white' : 'text-gray-400'}>{icon}</span>
+            <span className={isActive ? 'text-[var(--text-on-accent)]' : 'text-gray-400'}>{icon}</span>
             <span className="text-[13px] font-bold">{text}</span>
           </div>
         </NavLink>
@@ -130,12 +133,12 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
           onClick={onToggle}
           className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-200 rounded-xl mx-2 ${
             isActive && !isOpen
-              ? 'bg-blue-50 text-[#0066cc]' 
-              : 'text-gray-500 hover:bg-gray-105 hover:text-gray-900'
+              ? 'bg-[var(--accent-light)] text-[var(--text-primary)] font-bold' 
+              : 'text-gray-500 hover:bg-[var(--accent-light)] hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
           }`}
         >
           <div className="flex items-center space-x-3">
-            <span className={isActive && !isOpen ? 'text-[#0066cc]' : 'text-gray-400'}>{icon}</span>
+            <span className={isActive && !isOpen ? 'text-[var(--accent-color)]' : 'text-gray-400'}>{icon}</span>
             <span className="text-[13px] font-bold">{text}</span>
           </div>
           <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -143,13 +146,13 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
       )}
       
       {subItems && isOpen && (
-        <div className="mt-1 ml-6 border-l-2 border-blue-50 pl-4 space-y-1 animate-in slide-in-from-left-2 duration-300">
+        <div className="mt-1 ml-6 border-l-2 border-[var(--border-color)] pl-4 space-y-1 animate-in slide-in-from-left-2 duration-300">
           {subItems.map((sub, idx) => (
             <NavLink 
               key={`${text}-sub-${idx}`} 
               to={sub.path}
               className={({ isActive }) => `block py-2 text-[12px] transition-colors ${
-                isActive ? 'text-[#0066cc] font-black' : 'text-gray-400 hover:text-[#0066cc] font-medium'
+                isActive ? 'text-[var(--accent-color)] font-black' : 'text-gray-400 hover:text-[var(--accent-color)] font-medium'
               }`}
             >
               {sub.text}
@@ -163,6 +166,7 @@ const SidebarItem = ({ icon, text, path, subItems, isOpen, onToggle, isCollapsed
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { language, setLanguage, t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
   const { notifications, markAllAsRead, markAsRead, clearAll } = useNotificationStore();
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -484,13 +488,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           isCollapsed ? 'lg:w-[76px]' : 'lg:w-[260px]'
         }`}
       >
-        <div className={`h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-[#0066cc] transition-all duration-300 shrink-0 ${isCollapsed ? 'lg:px-4' : 'px-6'}`}>
+        <div className={`h-16 flex items-center justify-between px-6 border-b border-[var(--border-color)] bg-[var(--bg-sidebar)] transition-all duration-300 shrink-0 ${isCollapsed ? 'lg:px-4' : 'px-6'}`}>
           <Link to="/" className="flex items-center space-x-2 overflow-hidden">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-md shrink-0">
-              <span className="text-[#0066cc] font-bold text-xl">N</span>
+            <div className="w-8 h-8 bg-[var(--accent-color)] text-[var(--text-on-accent)] rounded-lg flex items-center justify-center shadow-md shrink-0 transition-colors">
+              <span className="font-bold text-xl">N</span>
             </div>
             {!isCollapsed && (
-              <span className="font-bold text-lg tracking-tight text-white uppercase whitespace-nowrap animate-in fade-in duration-300">
+              <span className="font-bold text-lg tracking-tight text-[var(--text-primary)] uppercase whitespace-nowrap animate-in fade-in duration-300">
                 NeoBoard SaaS
               </span>
             )}
@@ -543,7 +547,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </button>
             <div className="relative hidden md:block">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
-              <input type="text" placeholder={t("search")} className="pl-10 pr-4 py-2 bg-gray-50 border border-transparent rounded-xl text-sm w-72 focus:ring-2 focus:ring-[#0066cc]/10 focus:bg-white focus:border-gray-200 transition-all outline-none" />
+              <input type="text" placeholder={t("search")} className="pl-10 pr-4 py-2 bg-gray-50 border border-transparent rounded-xl text-sm w-72 focus:ring-2 focus:ring-[var(--accent-color)]/20 focus:bg-white focus:border-[var(--border-color)] transition-all outline-none" />
             </div>
           </div>
           
@@ -557,9 +561,18 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <span>{language === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN'}</span>
             </button>
 
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center p-2.5 bg-gray-50 border border-gray-150 hover:bg-gray-100 hover:border-gray-300 rounded-xl text-gray-400 hover:text-[var(--accent-color)] transition-all shadow-sm w-8 h-8"
+              title={theme === 'light' ? 'Chuyển sang giao diện tối' : 'Chuyển sang giao diện sáng'}
+            >
+              {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+            </button>
+
             <div className="relative" ref={notificationRef}>
               <div 
-                className="relative cursor-pointer text-gray-400 hover:text-[#0066cc] transition-all p-2.5 hover:bg-gray-50 rounded-full" 
+                className="relative cursor-pointer text-gray-400 hover:text-[var(--accent-color)] transition-all p-2.5 hover:bg-gray-50 rounded-full" 
                 onClick={() => {
                   setShowNoti(!showNoti);
                   if (!showNoti) markAllAsRead();
@@ -610,7 +623,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             <span className="text-[9px] text-gray-300 font-bold mt-1 block">{noti.time}</span>
                           </div>
                           {!noti.read && (
-                            <span className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                            <span className="h-1.5 w-1.5 bg-[var(--accent-color)] rounded-full mt-1.5 flex-shrink-0"></span>
                           )}
                         </div>
                       ))
@@ -628,7 +641,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center space-x-3 p-1.5 pr-3 hover:bg-gray-50 rounded-full transition-all border border-transparent hover:border-gray-100"
                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0066cc] to-blue-400 flex items-center justify-center text-white text-xs font-black shadow-lg shadow-blue-100">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--accent-color)] to-slate-400 flex items-center justify-center text-white text-xs font-black shadow-lg">
                     {user?.fullName?.charAt(0) || 'U'}
                   </div>
                   <div className="text-left hidden sm:block">
@@ -658,7 +671,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       {(user?.role === 0 || user?.role === 1) && (
                         <button 
                           onClick={() => { navigate('/student/portal'); setIsUserMenuOpen(false); }}
-                          className="w-full flex items-center px-4 py-2.5 text-sm font-black text-blue-600 bg-blue-50/50 hover:bg-blue-50 transition-colors"
+                          className="w-full flex items-center px-4 py-2.5 text-sm font-black text-[var(--accent-color)] bg-[var(--accent-light)] hover:opacity-90 transition-colors"
                         >
                           <Eye size={16} className="mr-3" /> {t("view_student_portal")}
                         </button>
